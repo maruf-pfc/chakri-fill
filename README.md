@@ -11,13 +11,14 @@
 <p align="center">
   <img alt="Manifest Version" src="https://img.shields.io/badge/Manifest-v3-10b981?style=flat-square&logo=googlechrome&logoColor=white" />
   <img alt="License" src="https://img.shields.io/badge/License-GPLv3-06b6d4?style=flat-square" />
-  <img alt="Branch" src="https://img.shields.io/badge/Branch-feature%2Fautofill--engine-8b5cf6?style=flat-square&logo=git&logoColor=white" />
-  <img alt="Status" src="https://img.shields.io/badge/Status-Active%20Development-f59e0b?style=flat-square" />
+  <img alt="Platform" src="https://img.shields.io/badge/Platform-Chromium-8b5cf6?style=flat-square&logo=googlechrome&logoColor=white" />
+  <img alt="Status" src="https://img.shields.io/badge/Status-Developer%20Preview-f59e0b?style=flat-square" />
+  <img alt="Not on Web Store" src="https://img.shields.io/badge/Web%20Store-Not%20Published-ef4444?style=flat-square&logo=googlechrome&logoColor=white" />
 </p>
 
 ## ✨ What is ChakriFill?
 
-ChakriFill is a **Chromium browser extension** that automatically fills Bangladesh government job application forms hosted on the **Teletalk/National Pension Authority (NPA)** recruitment portal.
+ChakriFill is a **Chromium browser extension** that automatically fills Bangladesh government job application forms hosted on the **Teletalk** recruitment portal.
 
 Instead of tediously re-entering your name, address, educational qualifications, and job experience every time you apply for a new post, you save your profile **once** and ChakriFill populates the entire form in seconds — including the captcha.
 
@@ -35,77 +36,157 @@ Instead of tediously re-entering your name, address, educational qualifications,
 
 ---
 
-## 🚀 Installation (Developer Mode)
+## 🚀 Installation
 
-ChakriFill is currently in active development and is not yet published to the Chrome Web Store. Install it manually:
+> **⚠️ Not on the Chrome Web Store yet.**  
+> ChakriFill is in developer preview. You must load it manually using Chrome's
+> built-in Developer Mode — no special tools or coding knowledge required.
 
-### Prerequisites
-- Google Chrome, Brave, or any Chromium-based browser
-- Git (optional, for cloning)
+### Requirements
 
-### Steps
+- Google Chrome, Brave, Edge, or any Chromium-based browser
+- The extension source code (download or clone — see Step 1)
 
-**1. Get the source code**
+---
+
+### Step-by-Step Installation
+
+#### Step 1 — Get the source code
+
+**Option A — Download ZIP** _(easiest, no Git needed)_
+
+1. Go to **https://github.com/maruf-pfc/chakri-fill**
+2. Click the green **`<> Code`** button → **Download ZIP**
+3. Extract the ZIP anywhere on your computer (e.g. `Downloads/chakri-fill-main/`)
+
+**Option B — Clone with Git**
+
 ```bash
 git clone https://github.com/maruf-pfc/chakri-fill.git
-cd chakri-fill
 ```
 
-**2. Open Chrome Extensions page**
+---
 
-Navigate to `chrome://extensions` in your browser's address bar.
+#### Step 2 — Open Chrome Extensions
 
-**3. Enable Developer Mode**
+Type the following in your browser address bar and press Enter:
 
-Toggle the **"Developer mode"** switch in the top-right corner of the Extensions page.
+```
+chrome://extensions
+```
 
-**4. Load the extension**
+> For **Brave**: `brave://extensions` &nbsp;|&nbsp; For **Edge**: `edge://extensions`
 
-Click **"Load unpacked"** and select the root `chakri-fill/` directory (the one containing `manifest.json`).
+---
 
-**5. Pin the extension** _(recommended)_
+#### Step 3 — Enable Developer Mode
 
-Click the puzzle-piece icon in the toolbar and pin **ChakriFill** for quick access.
+In the top-right corner of the Extensions page, toggle the **"Developer mode"** switch **ON**.
+
+Three new buttons will appear: *Load unpacked*, *Pack extension*, *Update*.
+
+---
+
+#### Step 4 — Load the extension
+
+Click **"Load unpacked"** and select the folder you extracted/cloned in Step 1.
+
+> ✅ Select the folder that **directly contains `manifest.json`** — not a parent or subfolder.
+
+ChakriFill will now appear in your extensions list with a green toggle.
+
+---
+
+#### Step 5 — Pin it to your toolbar _(recommended)_
+
+1. Click the **puzzle-piece 🧩 icon** in the browser toolbar
+2. Find **ChakriFill** in the list
+3. Click the **pin 📌 icon** next to it
+
+The ChakriFill icon will now be permanently visible in your toolbar.
+
+---
+
+> **Note:** Every time you restart Chrome, the extension stays loaded automatically.
+> You do **not** need to re-load it. If Chrome warns you about "developer mode extensions",
+> simply dismiss the notification — this is normal for unpublished extensions.
 
 ---
 
 ## 🛠 How to Use
 
-### Step 1 — Set up your profile
+> **First time?** You must complete Step 1 (profile setup) before autofill will work.
+> You only need to do this once — your profile is saved permanently.
 
-1. Click the **ChakriFill icon** in your browser toolbar.
-2. Click **"Settings"** (or the gear icon).
-3. The **Options page** opens. Fill in all your details across the tabs:
-   - **Personal Info** — Name, NID, DOB, Contact, Quota
-   - **Address** — Present and Permanent address with district/upazila
-   - **Education** — SSC, HSC, Graduation, Masters
-   - **Experience** — Job history with employment type, dates, and description
-4. Click **"Save Profile"** at the bottom.
+---
 
-> **Tip:** Click **"Load Demo Profile"** to populate sample data and see what a completed profile looks like.
+### Step 1 — Set up your profile (one time only)
 
-### Step 2 — Open the application form
+1. Click the **ChakriFill icon** in your browser toolbar
+2. The popup opens — click the **⚙️ Settings** button
+3. The **Options page** opens in a new tab with these sections:
 
-Navigate to the Teletalk job application form in the same browser tab. The URL typically looks like:
+| Tab | What to fill in |
+|---|---|
+| **Personal Info** | Full name (English + Bangla), father/mother, DOB, NID, gender, religion, marital status, mobile, email, quota |
+| **Address** | Present address with district + upazila, permanent address (or tick "Same as Present") |
+| **Education** | SSC, HSC, Graduation details — exam type, board, group, result, year |
+| **Experience** | Job history — employment type, designation, dates, organization, description |
+| **Backup** | Export your profile as JSON or import a previously saved one |
+
+4. Click **"💾 Save Profile"** at the bottom of the page
+5. A green toast confirms your profile is saved
+
+> **💡 Tip:** Click **"Load Demo Profile"** to instantly fill the form with sample data and
+> explore how a complete profile looks before entering your own details.
+
+---
+
+### Step 2 — Open the Teletalk application form
+
+Navigate to the job application form. The URL looks like:
 
 ```
 https://recruitment.teletalk.com.bd/job/apply/...
 ```
 
-Or open `form.html` locally if you are testing.
+Make sure the form is **fully loaded** before triggering autofill.
 
-### Step 3 — Trigger autofill
+---
 
-1. Click the **ChakriFill icon** in the toolbar.
-2. The popup shows your profile summary and status badge (green = **Ready**).
-3. Click the **"⚡ Autofill Form"** button.
-4. ChakriFill injects the scripts, fills all fields, solves the captcha, and checks the declaration checkbox — all automatically.
+### Step 3 — Click Autofill
 
-> The button briefly shows **"Done! ✓"** in green on success, or **"Error"** in red with a console message if something went wrong.
+1. Click the **ChakriFill icon** in the toolbar — the popup opens
+2. You'll see your profile summary and a green **"Ready"** badge
+3. Click **"⚡ Autofill Form"**
+4. ChakriFill automatically:
+   - Fills all personal, address, and qualification fields
+   - Handles district → upazila cascading dropdowns
+   - Fills all job experience blocks
+   - Reads the hidden captcha value and fills the captcha field
+   - Ticks the declaration checkbox
+
+The button turns **green with "Done! ✓"** when finished, or **red with "Error"** if something failed (check DevTools Console for details).
+
+---
 
 ### Step 4 — Review and submit
 
-Take a moment to review the filled form visually, then submit. ChakriFill never submits on your behalf.
+Scroll through the form to verify the filled values, then submit normally.
+
+> **ChakriFill never auto-submits.** You are always in control of the final submission.
+
+---
+
+### Troubleshooting
+
+| Problem | Fix |
+|---|---|
+| Popup shows **"Empty"** badge | Go to Settings and save your profile first |
+| Button shows **"Error"** | Ensure you are on the actual Teletalk form page, not a different site |
+| Upazila not filled | The form's upazila list may take a moment — try clicking Autofill again |
+| Fields greyed out after fill | The form locked them (SSC/HSC verified mode) — this is expected |
+| Extension disappeared | Chrome may have disabled it after restart — go to `chrome://extensions` and re-enable |
 
 ---
 
@@ -306,13 +387,70 @@ Use `if_applicable_mas: true` to enable the Masters section.
 
 ## 🧪 Testing Locally
 
-To verify the autofill engine against the reference form without installing the extension:
+You can test the autofill engine directly against the bundled `form.html` file **without** installing the extension:
 
-1. Open `form.html` in your browser (or via a local server)
-2. Open **DevTools → Console** (`F12` → Console tab)
-3. Copy the contents of `brain/scratch/injected_test.js` and paste into the console
-4. Press **Enter** — the form will auto-populate with demo data
-5. Verify each section is filled correctly
+**1. Open the form**
+
+Open `form.html` from the repo root in your browser. You can simply double-click the file, or serve it:
+
+```bash
+# Option A: Direct file open (simplest)
+xdg-open form.html        # Linux
+open form.html            # macOS
+# Or drag-and-drop the file into a Chrome tab
+
+# Option B: Local server (avoids some browser file restrictions)
+npx serve .
+# Then visit http://localhost:3000/form.html
+```
+
+**2. Open DevTools Console**
+
+Press `F12` → click the **Console** tab.
+
+**3. Paste the test script**
+
+Copy and paste the following snippet into the console and press **Enter**:
+
+```js
+// Quick smoke test — fills form with demo data
+window.__cfTest = true;
+const s = document.createElement('script');
+s.textContent = `
+  window.ChakriFillHelpers = {
+    wait: ms => new Promise(r => setTimeout(r, ms)),
+    dispatchEvent: (el, t) => el && el.dispatchEvent(new Event(t, {bubbles:true})),
+    setValue: (sel, val) => {
+      const el = typeof sel === 'string' ? document.querySelector(sel) : sel;
+      if (el) { el.value = val ?? ''; ['input','change'].forEach(t => el.dispatchEvent(new Event(t,{bubbles:true}))); }
+    },
+    setCheckbox: (sel, on) => { const el = document.querySelector(sel); if (el && el.checked !== !!on) el.click(); },
+    selectDropdownSmart: (sel, val) => {
+      const el = typeof sel === 'string' ? document.querySelector(sel) : sel;
+      if (!el || val == null) return false;
+      const v = String(val).toLowerCase();
+      for (const o of el.options) if (o.value.toLowerCase() === v || o.text.toLowerCase().includes(v)) { el.value = o.value; el.dispatchEvent(new Event('change',{bubbles:true})); return true; }
+      return false;
+    },
+    waitForSelectOptions: async (sel, n=2, max=1500) => {
+      const el = document.querySelector(sel); if (!el) return;
+      const t = Date.now(); while (el.options.length < n && Date.now()-t < max) await new Promise(r=>setTimeout(r,50));
+    },
+    fillSelectWithOther: (sel, other, val) => {
+      const H = window.ChakriFillHelpers;
+      if (!H.selectDropdownSmart(sel, val) && val) {
+        const el = document.querySelector(sel);
+        for (const o of (el?.options ?? [])) if (o.value==='99'||o.value==='999'||o.text.toLowerCase().includes('other')) { el.value=o.value; el.dispatchEvent(new Event('change',{bubbles:true})); break; }
+        const oi = document.querySelector(other); if (oi) H.setValue(oi, val);
+      }
+    }
+  };
+`;
+document.head.appendChild(s);
+console.log('Helpers loaded. Now paste and run the matcher script.');
+```
+
+Then load and run `content/matcher.js` followed by `content/autofill.js` in the same console, or simply install the extension and use the popup button — that is the easiest verification path.
 
 ---
 
