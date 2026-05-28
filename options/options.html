@@ -1,29 +1,808 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
-    <title>ChakriFill Settings</title>
+    <title>ChakriFill Profile Manager</title>
+    <meta charset="utf-8">
     <link rel="stylesheet" href="options.css" />
   </head>
 
   <body>
-    <h1>ChakriFill Profile</h1>
+    <div class="container">
+      <header>
+        <div class="brand">
+          <div class="brand-logo">CF</div>
+          <div class="brand-details">
+            <h1>ChakriFill Profile</h1>
+            <p>Smart job application autofill manager for Bangladesh</p>
+          </div>
+        </div>
+        <div class="top-actions">
+          <button type="button" class="btn btn-secondary" id="loadMockBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            Load Demo Data
+          </button>
+          <button type="button" class="btn btn-ghost" id="resetBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+            Reset
+          </button>
+        </div>
+      </header>
 
-    <form id="profileForm">
-      <input type="text" id="name" placeholder="Full Name" />
+      <div class="toast-container" id="toastContainer"></div>
 
-      <input type="text" id="fatherName" placeholder="Father Name" />
+      <form id="profileForm">
+        <div class="settings-layout">
+          <!-- Sidebar Navigation -->
+          <aside class="sidebar-nav">
+            <button type="button" class="tab-btn active" data-tab="personal">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              Basic Info
+            </button>
+            <button type="button" class="tab-btn" data-tab="contact">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              Addresses
+            </button>
+            <button type="button" class="tab-btn" data-tab="academic">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"></path></svg>
+              Academic
+            </button>
+            <button type="button" class="tab-btn" data-tab="experience">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+              Job Experience
+            </button>
+            <button type="button" class="tab-btn" data-tab="backup">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              Import / Export
+            </button>
+          </aside>
 
-      <input type="text" id="motherName" placeholder="Mother Name" />
+          <!-- Main Form Container -->
+          <main class="main-panel">
+            <!-- TAB 1: PERSONAL INFO -->
+            <section class="tab-content active" id="personal">
+              <div class="panel-header">
+                <h2>Basic Information</h2>
+                <p>Provide your personal details exactly as they appear in official documents.</p>
+              </div>
 
-      <input type="email" id="email" placeholder="Email" />
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label for="name">Applicant's Name (English) <span class="required-badge">*</span></label>
+                  <input type="text" id="name" required placeholder="e.g. MOHAMMED RAHMAN" />
+                </div>
+                <div class="form-group">
+                  <label for="name_bn">Applicant's Name (Bangla) <span class="required-badge">*</span></label>
+                  <input type="text" id="name_bn" required placeholder="যেমন: মোহাম্মদ রহমান" />
+                </div>
+              </div>
 
-      <input type="text" id="mobile" placeholder="Mobile" />
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label for="father">Father's Name (English) <span class="required-badge">*</span></label>
+                  <input type="text" id="father" required />
+                </div>
+                <div class="form-group">
+                  <label for="father_bn">Father's Name (Bangla) <span class="required-badge">*</span></label>
+                  <input type="text" id="father_bn" required />
+                </div>
+              </div>
 
-      <input type="date" id="dob" />
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label for="mother">Mother's Name (English) <span class="required-badge">*</span></label>
+                  <input type="text" id="mother" required />
+                </div>
+                <div class="form-group">
+                  <label for="mother_bn">Mother's Name (Bangla) <span class="required-badge">*</span></label>
+                  <input type="text" id="mother_bn" required />
+                </div>
+              </div>
 
-      <button type="submit">Save Profile</button>
-    </form>
+              <div class="form-grid-3">
+                <div class="form-group">
+                  <label for="dob">Date of Birth <span class="required-badge">*</span></label>
+                  <input type="date" id="dob" required />
+                </div>
+                <div class="form-group">
+                  <label for="gender">Gender <span class="required-badge">*</span></label>
+                  <select id="gender" required>
+                    <option value="" disabled selected>Select</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Third Gender">Third Gender</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="religion">Religion <span class="required-badge">*</span></label>
+                  <select id="religion" required>
+                    <option value="" disabled selected>Select</option>
+                    <option value="1">Islam</option>
+                    <option value="2">Hinduism</option>
+                    <option value="3">Buddhism</option>
+                    <option value="4">Christianity</option>
+                    <option value="5">Other</option>
+                  </select>
+                </div>
+              </div>
 
+              <div class="form-grid-3">
+                <div class="form-group">
+                  <label for="nid">National ID (NID) <span class="required-badge">*</span></label>
+                  <select id="nid" required>
+                    <option value="" disabled selected>Select</option>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                  </select>
+                </div>
+                <div class="form-group" id="nidNoWrapper">
+                  <label for="nid_no">National ID Number</label>
+                  <input type="text" id="nid_no" />
+                </div>
+                <div class="form-group">
+                  <label for="nationality">Nationality <span class="required-badge">*</span></label>
+                  <input type="text" id="nationality" value="Bangladeshi" readonly />
+                </div>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label for="breg">Birth Registration <span class="required-badge">*</span></label>
+                  <select id="breg" required>
+                    <option value="" disabled selected>Select</option>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                  </select>
+                </div>
+                <div class="form-group" id="bregNoWrapper">
+                  <label for="breg_no">Birth Reg Number</label>
+                  <input type="text" id="breg_no" />
+                </div>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label for="passport">Passport ID <span class="required-badge">*</span></label>
+                  <select id="passport" required>
+                    <option value="" disabled selected>Select</option>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                  </select>
+                </div>
+                <div class="form-group" id="passportNoWrapper">
+                  <label for="passport_no">Passport Number</label>
+                  <input type="text" id="passport_no" />
+                </div>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label for="marital_status">Marital Status <span class="required-badge">*</span></label>
+                  <select id="marital_status" required>
+                    <option value="" disabled selected>Select</option>
+                    <option value="Single">Single</option>
+                    <option value="Married">Married</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div class="form-group" id="spouseNameWrapper">
+                  <label for="spouse_name">Spouse Name</label>
+                  <input type="text" id="spouse_name" />
+                </div>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label for="quota">Quota <span class="required-badge">*</span></label>
+                  <select id="quota" required>
+                    <option value="" disabled selected>Select</option>
+                    <option value="1">Child of Freedom Fighter</option>
+                    <option value="2">Child of Martyred Freedom Fighter</option>
+                    <option value="3">Child of War Heroine (Birangana)</option>
+                    <option value="4">Physically Challenged</option>
+                    <option value="6">Ethnic Minority</option>
+                    <option value="7">Third Gender</option>
+                    <option value="8">Not Applicable</option>
+                  </select>
+                </div>
+                <div class="form-group" id="quotaDetailsWrapper">
+                  <label for="quota_details">Quota Details</label>
+                  <input type="text" id="quota_details" placeholder="Certificate No, Date, etc." />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="dep_status">Departmental Status <span class="required-badge">*</span></label>
+                <select id="dep_status" required>
+                  <option value="" disabled selected>Select</option>
+                  <option value="1">Govt. Employee</option>
+                  <option value="2">Semi Govt. Employee</option>
+                  <option value="3">Autonomous</option>
+                  <option value="4">Departmental Candidate</option>
+                  <option value="5">Not Applicable</option>
+                </select>
+              </div>
+            </section>
+
+            <!-- TAB 2: ADDRESSES -->
+            <section class="tab-content" id="contact">
+              <div class="panel-header">
+                <h2>Contact & Addresses</h2>
+                <p>Enter your active phone number, email, and addresses.</p>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label for="mobile">Mobile Number <span class="required-badge">*</span></label>
+                  <input type="tel" id="mobile" required maxlength="11" placeholder="e.g. 01712345678" />
+                </div>
+                <div class="form-group">
+                  <label for="confirm_mobile">Confirm Mobile Number <span class="required-badge">*</span></label>
+                  <input type="tel" id="confirm_mobile" required maxlength="11" placeholder="e.g. 01712345678" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="email">Email Address <span class="required-badge">*</span></label>
+                <input type="email" id="email" required placeholder="e.g. developer@example.com" />
+              </div>
+
+              <!-- Present Address Section -->
+              <div class="address-section">
+                <div class="address-section-title">
+                  <span>Present Address (বর্তমান ঠিকানা)</span>
+                </div>
+                <div class="form-grid-2">
+                  <div class="form-group">
+                    <label for="present_careof">Care Of <span class="required-badge">*</span></label>
+                    <input type="text" id="present_careof" required placeholder="Father, mother, or guardian's name" />
+                  </div>
+                  <div class="form-group">
+                    <label for="present_post">Post Office <span class="required-badge">*</span></label>
+                    <input type="text" id="present_post" required placeholder="Post Office" />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="present_village">Village/Road/House/Flat <span class="required-badge">*</span></label>
+                  <textarea id="present_village" required placeholder="Enter full local street address details"></textarea>
+                </div>
+
+                <div class="form-grid-3">
+                  <div class="form-group">
+                    <label for="present_district">District <span class="required-badge">*</span></label>
+                    <select id="present_district" required>
+                      <option value="" disabled selected>Select District</option>
+                      <option value="40">Dhaka</option>
+                      <option value="60">Chattogram</option>
+                      <option value="25">Khulna</option>
+                      <option value="14">Rajshahi</option>
+                      <option value="51">Sylhet</option>
+                      <option value="29">Barishal</option>
+                      <option value="6">Rangpur</option>
+                      <option value="34">Mymensingh</option>
+                      <!-- Additional popular districts -->
+                      <option value="23">Jashore</option>
+                      <option value="55">Cumilla</option>
+                      <option value="16">Pabna</option>
+                      <option value="10">Bogura</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="present_upazila">Upazila/P.S. <span class="required-badge">*</span></label>
+                    <select id="present_upazila" required>
+                      <option value="" disabled selected>Select Upazila</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="present_postcode">Post Code <span class="required-badge">*</span></label>
+                    <input type="number" id="present_postcode" required min="1000" max="9999" placeholder="e.g. 1212" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Permanent Address Section -->
+              <div class="address-section">
+                <div class="address-section-title">
+                  <span>Permanent Address (স্থায়ী ঠিকানা)</span>
+                  <div class="form-group checkbox-row" style="margin-bottom: 0;">
+                    <input type="checkbox" id="same_as_present" />
+                    <label for="same_as_present" style="font-size: 0.85rem; color: var(--text-color);">Same as Present</label>
+                  </div>
+                </div>
+
+                <div id="permanentAddressFields">
+                  <div class="form-grid-2">
+                    <div class="form-group">
+                      <label for="permanent_careof">Care Of <span class="required-badge">*</span></label>
+                      <input type="text" id="permanent_careof" placeholder="Care of" />
+                    </div>
+                    <div class="form-group">
+                      <label for="permanent_post">Post Office <span class="required-badge">*</span></label>
+                      <input type="text" id="permanent_post" placeholder="Post Office" />
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="permanent_village">Village/Road/House/Flat <span class="required-badge">*</span></label>
+                    <textarea id="permanent_village" placeholder="Enter permanent village details"></textarea>
+                  </div>
+
+                  <div class="form-grid-3">
+                    <div class="form-group">
+                      <label for="permanent_district">District <span class="required-badge">*</span></label>
+                      <select id="permanent_district">
+                        <option value="" disabled selected>Select District</option>
+                        <option value="40">Dhaka</option>
+                        <option value="60">Chattogram</option>
+                        <option value="25">Khulna</option>
+                        <option value="14">Rajshahi</option>
+                        <option value="51">Sylhet</option>
+                        <option value="29">Barishal</option>
+                        <option value="6">Rangpur</option>
+                        <option value="34">Mymensingh</option>
+                        <option value="23">Jashore</option>
+                        <option value="55">Cumilla</option>
+                        <option value="16">Pabna</option>
+                        <option value="10">Bogura</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="permanent_upazila">Upazila/P.S. <span class="required-badge">*</span></label>
+                      <select id="permanent_upazila">
+                        <option value="" disabled selected>Select Upazila</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="permanent_postcode">Post Code <span class="required-badge">*</span></label>
+                      <input type="number" id="permanent_postcode" min="1000" max="9999" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- TAB 3: ACADEMIC -->
+            <section class="tab-content" id="academic">
+              <div class="panel-header">
+                <h2>Academic Qualifications</h2>
+                <p>Add your educational achievements starting from secondary level.</p>
+              </div>
+
+              <!-- SSC Level -->
+              <div class="academic-card">
+                <div class="academic-card-title">
+                  <span>SSC/Equivalent Level</span>
+                </div>
+                <div class="form-grid-3">
+                  <div class="form-group">
+                    <label for="ssc_exam">Examination <span class="required-badge">*</span></label>
+                    <select id="ssc_exam" required>
+                      <option value="" disabled selected>Select</option>
+                      <option value="1">S.S.C</option>
+                      <option value="2">Dakhil</option>
+                      <option value="3">S.S.C Vocational</option>
+                      <option value="4">O Level/Cambridge</option>
+                      <option value="5">S.S.C Equivalent</option>
+                      <option value="6">Dakhil Vocational</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="ssc_roll">Roll Number <span class="required-badge">*</span></label>
+                    <input type="text" id="ssc_roll" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="ssc_group">Group / Subject <span class="required-badge">*</span></label>
+                    <select id="ssc_group" required>
+                      <option value="" disabled selected>Select</option>
+                      <option value="Science">Science</option>
+                      <option value="Humanities">Humanities</option>
+                      <option value="Commerce">Commerce</option>
+                      <option value="Vocational">Vocational</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-grid-3">
+                  <div class="form-group">
+                    <label for="ssc_board">Board <span class="required-badge">*</span></label>
+                    <select id="ssc_board" required>
+                      <option value="" disabled selected>Select</option>
+                      <option value="14">Dhaka</option>
+                      <option value="12">Chattogram</option>
+                      <option value="13">Cumilla</option>
+                      <option value="19">Rajshahi</option>
+                      <option value="20">Sylhet</option>
+                      <option value="11">Barishal</option>
+                      <option value="16">Jashore</option>
+                      <option value="15">Dinajpur</option>
+                      <option value="18">Mymensingh</option>
+                      <option value="17">Madrasah</option>
+                      <option value="26">Technical (BTEB)</option>
+                      <option value="99">Other</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="ssc_result_type">Result Type <span class="required-badge">*</span></label>
+                    <select id="ssc_result_type" required>
+                      <option value="" disabled selected>Select</option>
+                      <option value="1">1st Division</option>
+                      <option value="2">2nd Division</option>
+                      <option value="3">3rd Division</option>
+                      <option value="4">GPA (out of 4)</option>
+                      <option value="5">GPA (out of 5)</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="ssc_result">Result (CGPA/Division) <span class="required-badge">*</span></label>
+                    <input type="text" id="ssc_result" required placeholder="e.g. 5.00" />
+                  </div>
+                </div>
+
+                <div class="form-group" style="width: 33%;">
+                  <label for="ssc_year">Passing Year <span class="required-badge">*</span></label>
+                  <select id="ssc_year" required>
+                    <option value="" disabled selected>Select</option>
+                    <!-- Script will populate years, or add basic ones -->
+                    <option value="2026">2026</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
+                    <option value="2021">2021</option>
+                    <option value="2020">2020</option>
+                    <option value="2019">2019</option>
+                    <option value="2018">2018</option>
+                    <option value="2017">2017</option>
+                    <option value="2016">2016</option>
+                    <option value="2015">2015</option>
+                    <option value="2014">2014</option>
+                    <option value="2013">2013</option>
+                    <option value="2012">2012</option>
+                    <option value="2011">2011</option>
+                    <option value="2010">2010</option>
+                    <option value="2009">2009</option>
+                    <option value="2008">2008</option>
+                    <option value="2007">2007</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- HSC Level -->
+              <div class="academic-card" style="border-left-color: var(--primary-color);">
+                <div class="academic-card-title">
+                  <span>HSC/Equivalent Level</span>
+                </div>
+                <div class="form-grid-3">
+                  <div class="form-group">
+                    <label for="hsc_exam">Examination <span class="required-badge">*</span></label>
+                    <select id="hsc_exam" required>
+                      <option value="" disabled selected>Select</option>
+                      <option value="1">H.S.C</option>
+                      <option value="2">Alim</option>
+                      <option value="3">Business Management</option>
+                      <option value="4">Diploma-in-Engineering</option>
+                      <option value="5">A Level/Sr. Cambridge</option>
+                      <option value="6">H.S.C Equivalent</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="hsc_roll">Roll Number <span class="required-badge">*</span></label>
+                    <input type="text" id="hsc_roll" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="hsc_group">Group / Subject <span class="required-badge">*</span></label>
+                    <select id="hsc_group" required>
+                      <option value="" disabled selected>Select</option>
+                      <option value="Science">Science</option>
+                      <option value="Humanities">Humanities</option>
+                      <option value="Commerce">Commerce</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-grid-3">
+                  <div class="form-group">
+                    <label for="hsc_board">Board <span class="required-badge">*</span></label>
+                    <select id="hsc_board" required>
+                      <option value="" disabled selected>Select</option>
+                      <option value="14">Dhaka</option>
+                      <option value="12">Chattogram</option>
+                      <option value="13">Cumilla</option>
+                      <option value="19">Rajshahi</option>
+                      <option value="20">Sylhet</option>
+                      <option value="11">Barishal</option>
+                      <option value="16">Jashore</option>
+                      <option value="15">Dinajpur</option>
+                      <option value="18">Mymensingh</option>
+                      <option value="17">Madrasah</option>
+                      <option value="26">Technical (BTEB)</option>
+                      <option value="99">Other</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="hsc_result_type">Result Type <span class="required-badge">*</span></label>
+                    <select id="hsc_result_type" required>
+                      <option value="" disabled selected>Select</option>
+                      <option value="1">1st Division</option>
+                      <option value="2">2nd Division</option>
+                      <option value="3">3rd Division</option>
+                      <option value="4">GPA (out of 4)</option>
+                      <option value="5">GPA (out of 5)</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="hsc_result">Result (CGPA/Division) <span class="required-badge">*</span></label>
+                    <input type="text" id="hsc_result" required placeholder="e.g. 4.80" />
+                  </div>
+                </div>
+
+                <div class="form-group" style="width: 33%;">
+                  <label for="hsc_year">Passing Year <span class="required-badge">*</span></label>
+                  <select id="hsc_year" required>
+                    <option value="" disabled selected>Select</option>
+                    <option value="2026">2026</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
+                    <option value="2021">2021</option>
+                    <option value="2020">2020</option>
+                    <option value="2019">2019</option>
+                    <option value="2018">2018</option>
+                    <option value="2017">2017</option>
+                    <option value="2016">2016</option>
+                    <option value="2015">2015</option>
+                    <option value="2014">2014</option>
+                    <option value="2013">2013</option>
+                    <option value="2012">2012</option>
+                    <option value="2011">2011</option>
+                    <option value="2010">2010</option>
+                    <option value="2009">2009</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Graduation Level -->
+              <div class="academic-card" style="border-left-color: var(--accent-color);">
+                <div class="academic-card-title">
+                  <span>Graduation/Equivalent Level</span>
+                </div>
+                <div class="form-grid-3">
+                  <div class="form-group">
+                    <label for="gra_exam">Examination <span class="required-badge">*</span></label>
+                    <select id="gra_exam" required>
+                      <option value="" disabled selected>Select</option>
+                      <option value="1">B.Sc Engineering</option>
+                      <option value="4">Honors</option>
+                      <option value="5">B.A Pass Course</option>
+                      <option value="9">MBBS/BDS</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="gra_institute">University/Inst. <span class="required-badge">*</span></label>
+                    <select id="gra_institute" required>
+                      <option value="" disabled selected>Select University</option>
+                      <option value="168">Dhaka University (DU)</option>
+                      <option value="131">Bangladesh Univ. of Engineering & Tech (BUET)</option>
+                      <option value="273">Rajshahi University (RU)</option>
+                      <option value="324">Chittagong University (CU)</option>
+                      <option value="211">Jahangirnagar University (JU)</option>
+                      <option value="210">Jagannath University (JnU)</option>
+                      <option value="290">Shahjalal Univ. of Science & Tech (SUST)</option>
+                      <option value="223">Khulna University of Eng. & Tech (KUET)</option>
+                      <option value="274">Rajshahi University of Eng. & Tech (RUET)</option>
+                      <option value="152">Chittagong Univ. of Eng. & Tech (CUET)</option>
+                      <option value="240">National University (NU)</option>
+                      <option value="999">Other / Private University</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="gra_subject">Subject / Degree <span class="required-badge">*</span></label>
+                    <input type="text" id="gra_subject" required placeholder="e.g. Computer Science & Engineering" />
+                  </div>
+                </div>
+
+                <div class="form-grid-3">
+                  <div class="form-group">
+                    <label for="gra_result_type">Result Type <span class="required-badge">*</span></label>
+                    <select id="gra_result_type" required>
+                      <option value="" disabled selected>Select</option>
+                      <option value="1">1st Class</option>
+                      <option value="2">2nd Class</option>
+                      <option value="4">CGPA (out of 4)</option>
+                      <option value="5">CGPA (out of 5)</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="gra_result">Result (CGPA) <span class="required-badge">*</span></label>
+                    <input type="text" id="gra_result" required placeholder="e.g. 3.75" />
+                  </div>
+                  <div class="form-group">
+                    <label for="gra_duration">Course Duration <span class="required-badge">*</span></label>
+                    <select id="gra_duration" required>
+                      <option value="" disabled selected>Select</option>
+                      <option value="03">03 Years</option>
+                      <option value="04">04 Years</option>
+                      <option value="05">05 Years</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group" style="width: 33%;">
+                  <label for="gra_year">Passing Year <span class="required-badge">*</span></label>
+                  <select id="gra_year" required>
+                    <option value="" disabled selected>Select</option>
+                    <option value="2026">2026</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
+                    <option value="2021">2021</option>
+                    <option value="2020">2020</option>
+                    <option value="2019">2019</option>
+                    <option value="2018">2018</option>
+                    <option value="2017">2017</option>
+                    <option value="2016">2016</option>
+                    <option value="2015">2015</option>
+                    <option value="2014">2014</option>
+                    <option value="2013">2013</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Masters Level -->
+              <div class="academic-card" style="border-left-color: var(--danger-color);">
+                <div class="academic-card-title">
+                  <span>Masters/Equivalent Level</span>
+                  <div class="form-group checkbox-row" style="margin-bottom: 0;">
+                    <input type="checkbox" id="if_applicable_mas" />
+                    <label for="if_applicable_mas" style="font-size: 0.85rem; color: var(--text-color);">Include Masters Details</label>
+                  </div>
+                </div>
+
+                <div id="mastersFields" class="conditional-hide">
+                  <div class="form-grid-3">
+                    <div class="form-group">
+                      <label for="mas_exam">Examination <span class="required-badge">*</span></label>
+                      <select id="mas_exam">
+                        <option value="" disabled selected>Select</option>
+                        <option value="1">M.A</option>
+                        <option value="2">M.S.S</option>
+                        <option value="3">M.Sc</option>
+                        <option value="5">M.B.A</option>
+                        <option value="10">Masters Equivalent</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="mas_institute">University/Inst. <span class="required-badge">*</span></label>
+                      <select id="mas_institute">
+                        <option value="" disabled selected>Select University</option>
+                        <option value="168">Dhaka University (DU)</option>
+                        <option value="131">Bangladesh Univ. of Engineering & Tech (BUET)</option>
+                        <option value="273">Rajshahi University (RU)</option>
+                        <option value="324">Chittagong University (CU)</option>
+                        <option value="240">National University (NU)</option>
+                        <option value="999">Other / Private University</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="mas_subject">Subject / Degree <span class="required-badge">*</span></label>
+                      <input type="text" id="mas_subject" placeholder="e.g. Computer Science" />
+                    </div>
+                  </div>
+
+                  <div class="form-grid-3">
+                    <div class="form-group">
+                      <label for="mas_result_type">Result Type <span class="required-badge">*</span></label>
+                      <select id="mas_result_type">
+                        <option value="" disabled selected>Select</option>
+                        <option value="1">1st Class</option>
+                        <option value="2">2nd Class</option>
+                        <option value="4">CGPA (out of 4)</option>
+                        <option value="5">CGPA (out of 5)</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="mas_result">Result (CGPA) <span class="required-badge">*</span></label>
+                      <input type="text" id="mas_result" placeholder="e.g. 3.85" />
+                    </div>
+                    <div class="form-group">
+                      <label for="mas_duration">Course Duration <span class="required-badge">*</span></label>
+                      <select id="mas_duration">
+                        <option value="" disabled selected>Select</option>
+                        <option value="01">01 Year</option>
+                        <option value="1.5">1.5 Years</option>
+                        <option value="02">02 Years</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group" style="width: 33%;">
+                    <label for="mas_year">Passing Year <span class="required-badge">*</span></label>
+                    <select id="mas_year">
+                      <option value="" disabled selected>Select</option>
+                      <option value="2026">2026</option>
+                      <option value="2025">2025</option>
+                      <option value="2024">2024</option>
+                      <option value="2023">2023</option>
+                      <option value="2022">2022</option>
+                      <option value="2021">2021</option>
+                      <option value="2020">2020</option>
+                      <option value="2019">2019</option>
+                      <option value="2018">2018</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- TAB 4: JOB EXPERIENCE -->
+            <section class="tab-content" id="experience">
+              <div class="panel-header">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <h2>Job Experience</h2>
+                    <p>Add prior professional work experience history if applicable.</p>
+                  </div>
+                  <div class="form-group checkbox-row" style="margin-bottom: 0;">
+                    <input type="checkbox" id="if_applicable_exp" />
+                    <label for="if_applicable_exp" style="font-weight: 600; color: var(--primary-color);">Has Job Experience</label>
+                  </div>
+                </div>
+              </div>
+
+              <div id="experienceFields" class="conditional-hide">
+                <div class="experience-list" id="experienceList">
+                  <!-- Dynamic job items will be appended here -->
+                </div>
+                
+                <button type="button" class="btn btn-secondary" id="addJobBtn" style="margin-top: 1.5rem;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  Add Another Experience
+                </button>
+              </div>
+            </section>
+
+            <!-- TAB 5: IMPORT / EXPORT -->
+            <section class="tab-content" id="backup">
+              <div class="panel-header">
+                <h2>Import / Export Profile</h2>
+                <p>Backup your data by saving the configuration code, or upload an existing profile backup.</p>
+              </div>
+
+              <div class="json-actions">
+                <div class="json-box">
+                  <label for="jsonTextarea" style="font-size: 0.95rem; color: var(--secondary-color); font-weight: 600;">Profile Data (JSON)</label>
+                  <textarea id="jsonTextarea" class="json-textarea" rows="12" placeholder="Paste your profile backup JSON here..."></textarea>
+                  
+                  <div class="json-buttons">
+                    <button type="button" class="btn btn-secondary" id="importJsonBtn">Import Profile</button>
+                    <button type="button" class="btn btn-ghost" id="copyJsonBtn">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                      Copy JSON
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Form Footer Actions -->
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" id="saveProfileBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                Save Profile
+              </button>
+            </div>
+
+          </main>
+        </div>
+      </form>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../storage/defaultProfile.js"></script>
     <script src="options.js"></script>
   </body>
 </html>
