@@ -1,4 +1,4 @@
-<![CDATA[<p align="center">
+<p align="center">
   <img src="assets/banner.png" alt="ChakriFill Banner" width="100%" />
 </p>
 
@@ -352,4 +352,3 @@ This project is licensed under the **GNU General Public License v3.0**. See [LIC
 ---
 
 <p align="center">Made with ❤️ for Bangladeshi job seekers — stop wasting time on forms.</p>
-]]>
