@@ -20,7 +20,7 @@
 
 ChakriFill is a **Chromium browser extension** that automatically fills Bangladesh government job application forms hosted on the **Teletalk** recruitment portal.
 
-Instead of tediously re-entering your name, address, educational qualifications, and job experience every time you apply for a new post, you save your profile **once** and ChakriFill populates the entire form in seconds — including the captcha.
+Instead of tediously re-entering your name, address, educational qualifications, and job experience every time you apply for a new post, you save your profile **once** and ChakriFill populates the entire form in seconds.
 
 ### 🎯 Key Features
 
