@@ -214,6 +214,7 @@ chakri-fill/
 ├── form.html               # Local copy of the Teletalk NPA form (for dev/testing)
 ├── profile_template.yaml   # Sanitized YAML configuration template
 ├── package.json            # Project specifications & test scripts
+├── PRIVACY_POLICY.md       # Privacy policy detailing local-only storage and encryption
 ├── assets/
 │   ├── icons/              # Extension icons (16, 48, 128px)
 │   └── banner.png          # Project banner
@@ -232,9 +233,10 @@ chakri-fill/
 │   └── options.js          # Options controller — save/load/export/import profile
 │
 ├── content/
+│   ├── security.js         # Local encryption engine (AES-GCM 256-bit)
 │   ├── helpers.js          # DOM utilities (setValue, selectDropdownSmart, dispatchEvent…)
 │   ├── matcher.js          # Form mapping engine — maps profile keys to form fields
-│   └── autofill.js         # Entry point — fetches profile, calls matcher
+│   └── autofill.js         # Entry point — fetches profile, decrypts, calls matcher
 │
 └── storage/
     └── defaultProfile.js   # Default/demo profile schema reference (fully text-based)
@@ -244,18 +246,23 @@ chakri-fill/
 
 ## 🧠 Architecture Deep Dive
 
-ChakriFill uses a **three-layer injection architecture**, executed sequentially by `popup.js` via `chrome.scripting.executeScript`:
+ChakriFill uses a **four-layer injection architecture**, executed sequentially by `popup.js` via `chrome.scripting.executeScript`:
 
 ```
 popup.js
   └─ chrome.scripting.executeScript([
-        "content/helpers.js",    // Layer 1: Utility Library
-        "content/matcher.js",    // Layer 2: Mapping & Orchestration Engine
-        "content/autofill.js"    // Layer 3: Entry Point & Profile Fetcher
+        "content/security.js",   // Layer 1: Encryption & Decryption Engine
+        "content/helpers.js",    // Layer 2: DOM Utility Library
+        "content/matcher.js",    // Layer 3: Mapping & Orchestration Engine
+        "content/autofill.js"    // Layer 4: Entry Point & Decryption Hook
      ])
 ```
 
-### Layer 1 — `helpers.js` (Utility Library)
+### Layer 1 — `security.js` (Encryption Engine)
+
+Exposes `window.ChakriFillSecurity` which manages a persistent 256-bit key using the Web Crypto API to securely encrypt/decrypt profile JSON objects before writing/reading them from browser storage.
+
+### Layer 2 — `helpers.js` (Utility Library)
 
 Exposes `window.ChakriFillHelpers` with:
 
@@ -269,7 +276,7 @@ Exposes `window.ChakriFillHelpers` with:
 | `dispatchEvent(element, type)` | Fires a bubbling, cancellable native DOM event |
 | `wait(ms)` | Simple async delay |
 
-### Layer 2 — `matcher.js` (Mapping Engine)
+### Layer 3 — `matcher.js` (Mapping Engine)
 
 Exposes `window.ChakriFillMatcher.autofill(profile)`. This async function:
 
@@ -279,11 +286,11 @@ Exposes `window.ChakriFillMatcher.autofill(profile)`. This async function:
 4. Fills **all job experience blocks** using indexed `name="job[i][field]"` selectors
 5. Solves the captcha by reading the hidden `#CAPTCHA_ACTUAL` element
 
-### Layer 3 — `autofill.js` (Entry Point)
+### Layer 4 — `autofill.js` (Entry Point)
 
 An immediately-invoked async function that:
-1. Calls `chrome.storage.local.get("profile")` to retrieve the saved profile
-2. Shows an alert if no profile is found
+1. Calls `chrome.storage.local.get("profile")` to retrieve the saved encrypted profile
+2. Decrypts the profile payload using `ChakriFillSecurity` and the local browser installation key
 3. Calls `ChakriFillMatcher.autofill(profile)`
 
 ---
