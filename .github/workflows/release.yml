@@ -1,0 +1,46 @@
+name: Release ChakriFill Extension
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build & Release Extension
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Zip Utility
+        run: |
+          if ! command -v zip &> /dev/null; then
+            sudo apt-get update && sudo apt-get install -y zip
+          fi
+
+      - name: Run Tests
+        run: node tests/run.js
+
+      - name: Build Extension Packages
+        run: node scripts/build.js
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/chakri-fill-chrome.zip
+            dist/chakri-fill-firefox.zip
+          draft: false
+          prerelease: false
+          generate_release_notes: true
