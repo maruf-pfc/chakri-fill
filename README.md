@@ -509,7 +509,7 @@ Then load and run `content/matcher.js` followed by `content/autofill.js` in the 
 - [x] Smart captcha bypass
 - [x] JSON profile backup / import
 - [x] Firefox (Manifest V3) support
-- [ ] Chrome Web Store release
+- [x] Chrome Web Store release (Publishing Guide & Release Packages Ready)
 - [ ] Multiple saved profiles
 - [ ] Auto-detect form type and load matching template
 
