@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>ChakriFill Profile Manager</title>
+    <title>ChakriFill Profile Manager - Smart BD Job Autofill</title>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ChakriFill Profile Manager. Configure and manage your offline profile for automatic job application filing in Bangladesh (Teletalk).">
+    <meta name="keywords" content="ChakriFill, Teletalk, Bangladesh, Autofill, Government jobs, Recruitment, BD job fill, alljobs">
     <link rel="stylesheet" href="options.css" />
   </head>
 
@@ -270,28 +273,11 @@
                 <div class="form-grid-3">
                   <div class="form-group">
                     <label for="present_district">District <span class="required-badge">*</span></label>
-                    <select id="present_district" required>
-                      <option value="" disabled selected>Select District</option>
-                      <option value="40">Dhaka</option>
-                      <option value="60">Chattogram</option>
-                      <option value="25">Khulna</option>
-                      <option value="14">Rajshahi</option>
-                      <option value="51">Sylhet</option>
-                      <option value="29">Barishal</option>
-                      <option value="6">Rangpur</option>
-                      <option value="34">Mymensingh</option>
-                      <!-- Additional popular districts -->
-                      <option value="23">Jashore</option>
-                      <option value="55">Cumilla</option>
-                      <option value="16">Pabna</option>
-                      <option value="10">Bogura</option>
-                    </select>
+                    <input type="text" id="present_district" list="districts_list" required placeholder="e.g. Dhaka" />
                   </div>
                   <div class="form-group">
                     <label for="present_upazila">Upazila/P.S. <span class="required-badge">*</span></label>
-                    <select id="present_upazila" required>
-                      <option value="" disabled selected>Select Upazila</option>
-                    </select>
+                    <input type="text" id="present_upazila" list="present_upazilas_list" required placeholder="e.g. Hatirjheel" />
                   </div>
                   <div class="form-group">
                     <label for="present_postcode">Post Code <span class="required-badge">*</span></label>
@@ -330,27 +316,11 @@
                   <div class="form-grid-3">
                     <div class="form-group">
                       <label for="permanent_district">District <span class="required-badge">*</span></label>
-                      <select id="permanent_district">
-                        <option value="" disabled selected>Select District</option>
-                        <option value="40">Dhaka</option>
-                        <option value="60">Chattogram</option>
-                        <option value="25">Khulna</option>
-                        <option value="14">Rajshahi</option>
-                        <option value="51">Sylhet</option>
-                        <option value="29">Barishal</option>
-                        <option value="6">Rangpur</option>
-                        <option value="34">Mymensingh</option>
-                        <option value="23">Jashore</option>
-                        <option value="55">Cumilla</option>
-                        <option value="16">Pabna</option>
-                        <option value="10">Bogura</option>
-                      </select>
+                      <input type="text" id="permanent_district" list="districts_list" placeholder="e.g. Cumilla" />
                     </div>
                     <div class="form-group">
                       <label for="permanent_upazila">Upazila/P.S. <span class="required-badge">*</span></label>
-                      <select id="permanent_upazila">
-                        <option value="" disabled selected>Select Upazila</option>
-                      </select>
+                      <input type="text" id="permanent_upazila" list="permanent_upazilas_list" placeholder="e.g. Muradnagar" />
                     </div>
                     <div class="form-group">
                       <label for="permanent_postcode">Post Code <span class="required-badge">*</span></label>
@@ -406,21 +376,7 @@
                 <div class="form-grid-3">
                   <div class="form-group">
                     <label for="ssc_board">Board <span class="required-badge">*</span></label>
-                    <select id="ssc_board" required>
-                      <option value="" disabled selected>Select</option>
-                      <option value="14">Dhaka</option>
-                      <option value="12">Chattogram</option>
-                      <option value="13">Cumilla</option>
-                      <option value="19">Rajshahi</option>
-                      <option value="20">Sylhet</option>
-                      <option value="11">Barishal</option>
-                      <option value="16">Jashore</option>
-                      <option value="15">Dinajpur</option>
-                      <option value="18">Mymensingh</option>
-                      <option value="17">Madrasah</option>
-                      <option value="26">Technical (BTEB)</option>
-                      <option value="99">Other</option>
-                    </select>
+                    <input type="text" id="ssc_board" list="boards_list" required placeholder="e.g. Dhaka" />
                   </div>
                   <div class="form-group">
                     <label for="ssc_result_type">Result Type <span class="required-badge">*</span></label>
@@ -443,7 +399,6 @@
                   <label for="ssc_year">Passing Year <span class="required-badge">*</span></label>
                   <select id="ssc_year" required>
                     <option value="" disabled selected>Select</option>
-                    <!-- Script will populate years, or add basic ones -->
                     <option value="2026">2026</option>
                     <option value="2025">2025</option>
                     <option value="2024">2024</option>
@@ -462,8 +417,6 @@
                     <option value="2011">2011</option>
                     <option value="2010">2010</option>
                     <option value="2009">2009</option>
-                    <option value="2008">2008</option>
-                    <option value="2007">2007</option>
                   </select>
                 </div>
               </div>
@@ -505,21 +458,7 @@
                 <div class="form-grid-3">
                   <div class="form-group">
                     <label for="hsc_board">Board <span class="required-badge">*</span></label>
-                    <select id="hsc_board" required>
-                      <option value="" disabled selected>Select</option>
-                      <option value="14">Dhaka</option>
-                      <option value="12">Chattogram</option>
-                      <option value="13">Cumilla</option>
-                      <option value="19">Rajshahi</option>
-                      <option value="20">Sylhet</option>
-                      <option value="11">Barishal</option>
-                      <option value="16">Jashore</option>
-                      <option value="15">Dinajpur</option>
-                      <option value="18">Mymensingh</option>
-                      <option value="17">Madrasah</option>
-                      <option value="26">Technical (BTEB)</option>
-                      <option value="99">Other</option>
-                    </select>
+                    <input type="text" id="hsc_board" list="boards_list" required placeholder="e.g. Dhaka" />
                   </div>
                   <div class="form-group">
                     <label for="hsc_result_type">Result Type <span class="required-badge">*</span></label>
@@ -582,25 +521,11 @@
                   </div>
                   <div class="form-group">
                     <label for="gra_institute">University/Inst. <span class="required-badge">*</span></label>
-                    <select id="gra_institute" required>
-                      <option value="" disabled selected>Select University</option>
-                      <option value="168">Dhaka University (DU)</option>
-                      <option value="131">Bangladesh Univ. of Engineering & Tech (BUET)</option>
-                      <option value="273">Rajshahi University (RU)</option>
-                      <option value="324">Chittagong University (CU)</option>
-                      <option value="211">Jahangirnagar University (JU)</option>
-                      <option value="210">Jagannath University (JnU)</option>
-                      <option value="290">Shahjalal Univ. of Science & Tech (SUST)</option>
-                      <option value="223">Khulna University of Eng. & Tech (KUET)</option>
-                      <option value="274">Rajshahi University of Eng. & Tech (RUET)</option>
-                      <option value="152">Chittagong Univ. of Eng. & Tech (CUET)</option>
-                      <option value="240">National University (NU)</option>
-                      <option value="999">Other / Private University</option>
-                    </select>
+                    <input type="text" id="gra_institute" list="universities_list" required placeholder="e.g. Green University" />
                   </div>
                   <div class="form-group">
                     <label for="gra_subject">Subject / Degree <span class="required-badge">*</span></label>
-                    <input type="text" id="gra_subject" required placeholder="e.g. Computer Science & Engineering" />
+                    <input type="text" id="gra_subject" list="subjects_list" required placeholder="e.g. Computer Science & Engineering" />
                   </div>
                 </div>
 
@@ -617,7 +542,7 @@
                   </div>
                   <div class="form-group">
                     <label for="gra_result">Result (CGPA) <span class="required-badge">*</span></label>
-                    <input type="text" id="gra_result" required placeholder="e.g. 3.75" />
+                    <input type="text" id="gra_result" required placeholder="e.g. 3.05" />
                   </div>
                   <div class="form-group">
                     <label for="gra_duration">Course Duration <span class="required-badge">*</span></label>
@@ -677,19 +602,11 @@
                     </div>
                     <div class="form-group">
                       <label for="mas_institute">University/Inst. <span class="required-badge">*</span></label>
-                      <select id="mas_institute">
-                        <option value="" disabled selected>Select University</option>
-                        <option value="168">Dhaka University (DU)</option>
-                        <option value="131">Bangladesh Univ. of Engineering & Tech (BUET)</option>
-                        <option value="273">Rajshahi University (RU)</option>
-                        <option value="324">Chittagong University (CU)</option>
-                        <option value="240">National University (NU)</option>
-                        <option value="999">Other / Private University</option>
-                      </select>
+                      <input type="text" id="mas_institute" list="universities_list" placeholder="e.g. Dhaka University" />
                     </div>
                     <div class="form-group">
                       <label for="mas_subject">Subject / Degree <span class="required-badge">*</span></label>
-                      <input type="text" id="mas_subject" placeholder="e.g. Computer Science" />
+                      <input type="text" id="mas_subject" list="subjects_list" placeholder="e.g. Computer Science" />
                     </div>
                   </div>
 
@@ -769,20 +686,58 @@
             <section class="tab-content" id="backup">
               <div class="panel-header">
                 <h2>Import / Export Profile</h2>
-                <p>Backup your data by saving the configuration code, or upload an existing profile backup.</p>
+                <p>Easily import a YAML or JSON profile file, or copy-paste raw data to quickly setup your details.</p>
               </div>
 
-              <div class="json-actions">
-                <div class="json-box">
-                  <label for="jsonTextarea" style="font-size: 0.95rem; color: var(--secondary-color); font-weight: 600;">Profile Data (JSON)</label>
-                  <textarea id="jsonTextarea" class="json-textarea" rows="12" placeholder="Paste your profile backup JSON here..."></textarea>
+              <div class="sync-container">
+                <!-- Drag and Drop Zone -->
+                <div class="drop-zone" id="dropZone">
+                  <div class="drop-zone-content">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="drop-icon">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="17 8 12 3 7 8"></polyline>
+                      <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <h3>Drag & Drop Profile File</h3>
+                    <p>Supports <span>.yaml</span>, <span>.yml</span>, or <span>.json</span> files</p>
+                    <button type="button" class="btn btn-secondary btn-sm" id="fileSelectBtn">Browse File</button>
+                    <input type="file" id="fileInput" accept=".yaml,.yml,.json" style="display: none;" />
+                  </div>
+                </div>
+
+                <!-- Textarea Editor with Tabs -->
+                <div class="editor-panel">
+                  <div class="editor-tabs">
+                    <button type="button" class="editor-tab-btn active" data-format="yaml">YAML Editor</button>
+                    <button type="button" class="editor-tab-btn" data-format="json">JSON Editor</button>
+                  </div>
                   
-                  <div class="json-buttons">
-                    <button type="button" class="btn btn-secondary" id="importJsonBtn">Import Profile</button>
-                    <button type="button" class="btn btn-ghost" id="copyJsonBtn">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                      Copy JSON
-                    </button>
+                  <div class="editor-content">
+                    <!-- YAML Editor -->
+                    <div class="editor-view active" id="yamlEditorView">
+                      <textarea id="yamlTextarea" class="code-textarea" rows="12" placeholder="Paste your profile YAML here..."></textarea>
+                      <div class="editor-actions">
+                        <button type="button" class="btn btn-primary" id="importYamlBtn">Import YAML</button>
+                        <button type="button" class="btn btn-ghost" id="exportYamlBtn">Download YAML</button>
+                        <button type="button" class="btn btn-ghost" id="copyYamlBtn">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                          Copy YAML
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- JSON Editor -->
+                    <div class="editor-view" id="jsonEditorView">
+                      <textarea id="jsonTextarea" class="code-textarea" rows="12" placeholder="Paste your profile JSON here..."></textarea>
+                      <div class="editor-actions">
+                        <button type="button" class="btn btn-primary" id="importJsonBtn">Import JSON</button>
+                        <button type="button" class="btn btn-ghost" id="exportJsonBtn">Download JSON</button>
+                        <button type="button" class="btn btn-ghost" id="copyJsonBtn">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                          Copy JSON
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -801,7 +756,74 @@
       </form>
     </div>
 
+    <!-- Datalists for Autocomplete Suggestions -->
+    <datalist id="districts_list">
+      <option value="Dhaka"></option>
+      <option value="Chattogram"></option>
+      <option value="Cumilla"></option>
+      <option value="Khulna"></option>
+      <option value="Rajshahi"></option>
+      <option value="Sylhet"></option>
+      <option value="Barishal"></option>
+      <option value="Rangpur"></option>
+      <option value="Mymensingh"></option>
+      <option value="Jashore"></option>
+      <option value="Pabna"></option>
+      <option value="Bogura"></option>
+    </datalist>
+
+    <datalist id="present_upazilas_list"></datalist>
+    <datalist id="permanent_upazilas_list"></datalist>
+
+    <datalist id="boards_list">
+      <option value="Dhaka"></option>
+      <option value="Chattogram"></option>
+      <option value="Cumilla"></option>
+      <option value="Rajshahi"></option>
+      <option value="Sylhet"></option>
+      <option value="Barishal"></option>
+      <option value="Jashore"></option>
+      <option value="Dinajpur"></option>
+      <option value="Mymensingh"></option>
+      <option value="Madrasah"></option>
+      <option value="Technical (BTEB)"></option>
+    </datalist>
+
+    <datalist id="universities_list">
+      <option value="Dhaka University (DU)"></option>
+      <option value="Bangladesh Univ. of Engineering & Tech (BUET)"></option>
+      <option value="Rajshahi University (RU)"></option>
+      <option value="Chittagong University (CU)"></option>
+      <option value="Jahangirnagar University (JU)"></option>
+      <option value="Jagannath University (JnU)"></option>
+      <option value="Shahjalal Univ. of Science & Tech (SUST)"></option>
+      <option value="Khulna University of Eng. & Tech (KUET)"></option>
+      <option value="Rajshahi University of Eng. & Tech (RUET)"></option>
+      <option value="Chittagong Univ. of Eng. & Tech (CUET)"></option>
+      <option value="National University (NU)"></option>
+      <option value="Green University of Bangladesh"></option>
+      <option value="North South University"></option>
+      <option value="BRAC University"></option>
+      <option value="American International University-Bangladesh (AIUB)"></option>
+      <option value="Independent University Bangladesh (IUB)"></option>
+      <option value="Daffodil International University (DIU)"></option>
+    </datalist>
+
+    <datalist id="subjects_list">
+      <option value="Computer Science & Engineering"></option>
+      <option value="Electrical & Electronic Engineering"></option>
+      <option value="Civil Engineering"></option>
+      <option value="Mechanical Engineering"></option>
+      <option value="Business Administration"></option>
+      <option value="English"></option>
+      <option value="Economics"></option>
+      <option value="Physics"></option>
+      <option value="Chemistry"></option>
+      <option value="Mathematics"></option>
+    </datalist>
+
     <!-- Scripts -->
+    <script src="js-yaml.min.js"></script>
     <script src="../storage/defaultProfile.js"></script>
     <script src="options.js"></script>
   </body>

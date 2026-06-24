@@ -14,6 +14,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (typeof chrome !== "undefined" && chrome.storage) {
     const data = await chrome.storage.local.get("profile");
     profile = data.profile;
+  } else {
+    // Local storage fallback for local development/previews
+    const saved = localStorage.getItem("profile");
+    if (saved) {
+      try {
+        profile = JSON.parse(saved);
+      } catch (e) {
+        console.error("Local storage parse fail", e);
+      }
+    }
   }
 
   if (profile && profile.name) {

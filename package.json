@@ -1,0 +1,18 @@
+{
+  "name": "chakri-fill",
+  "version": "1.1.0",
+  "description": "Smart job application autofill Chrome extension for Bangladesh",
+  "main": "background/background.js",
+  "scripts": {
+    "test": "node tests/run.js"
+  },
+  "keywords": [
+    "chrome-extension",
+    "autofill",
+    "teletalk",
+    "bangladesh",
+    "jobs"
+  ],
+  "author": "maruf-pfc",
+  "license": "GNU GENERAL PUBLIC LICENSE"
+}

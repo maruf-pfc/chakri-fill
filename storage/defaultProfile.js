@@ -1,14 +1,14 @@
 const DEFAULT_PROFILE = {
   // Basic Information
-  name: "Maruf Rahman",
-  name_bn: "মারুফ রহমান",
+  name: "Rahim Uddin",
+  name_bn: "রহিম উদ্দিন",
   father: "Anisur Rahman",
   father_bn: "আনিসুর রহমান",
   mother: "Sufia Begum",
   mother_bn: "সুফিয়া বেগম",
   dob: "1998-06-15",
   nationality: "Bangladeshi",
-  religion: "1", // 1: Islam, 2: Hinduism, etc.
+  religion: "Islam", // Smart matched by text
   gender: "Male",
   nid: "1", // Yes
   nid_no: "5504123456",
@@ -20,7 +20,7 @@ const DEFAULT_PROFILE = {
   spouse_name: "",
   mobile: "01712345678",
   confirm_mobile: "01712345678",
-  email: "maruf.dev@example.com",
+  email: "rahim.uddin@example.com",
   quota: "8", // 8: Not Applicable
   quota_details: "",
   dep_status: "5", // 5: Not Applicable
@@ -28,8 +28,8 @@ const DEFAULT_PROFILE = {
   // Present Address
   present_careof: "Anisur Rahman",
   present_village: "House 12, Road 4, Sector 3",
-  present_district: "40", // Dhaka (Code from form.html is 40)
-  present_upazila: "314", // Gulshan (Code from form.html is 314)
+  present_district: "Dhaka", // Text-based
+  present_upazila: "Gulshan", // Text-based
   present_post: "Gulshan",
   present_postcode: "1212",
 
@@ -37,8 +37,8 @@ const DEFAULT_PROFILE = {
   same_as_present: true,
   permanent_careof: "Anisur Rahman",
   permanent_village: "House 12, Road 4, Sector 3",
-  permanent_district: "40",
-  permanent_upazila: "314",
+  permanent_district: "Dhaka",
+  permanent_upazila: "Gulshan",
   permanent_post: "Gulshan",
   permanent_postcode: "1212",
 
@@ -46,7 +46,7 @@ const DEFAULT_PROFILE = {
   ssc_exam: "1", // S.S.C
   ssc_roll: "102938",
   ssc_group: "Science", // Group/Subject
-  ssc_board: "14", // Dhaka
+  ssc_board: "Dhaka", // Text-based
   ssc_result_type: "5", // GPA(out of 5)
   ssc_result: "5.00",
   ssc_year: "2014",
@@ -54,13 +54,13 @@ const DEFAULT_PROFILE = {
   hsc_exam: "1", // H.S.C
   hsc_roll: "654321",
   hsc_group: "Science",
-  hsc_board: "14", // Dhaka
+  hsc_board: "Dhaka", // Text-based
   hsc_result_type: "5", // GPA(out of 5)
   hsc_result: "4.80",
   hsc_year: "2016",
 
   gra_exam: "1", // B.Sc Engineering
-  gra_institute: "168", // Dhaka University
+  gra_institute: "Dhaka University", // Text-based
   gra_year: "2020",
   gra_subject: "Computer Science & Engineering", // Matching value
   gra_result_type: "4", // CGPA(out of 4)

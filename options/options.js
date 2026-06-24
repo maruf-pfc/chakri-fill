@@ -1,4 +1,19 @@
 // Dynamic Upazila Mapping based on popular districts from form.html
+const DISTRICT_TO_CODE = {
+  "dhaka": "40",
+  "jashore": "23",
+  "chattogram": "60",
+  "khulna": "25",
+  "rajshahi": "14",
+  "sylhet": "51",
+  "barishal": "29",
+  "rangpur": "6",
+  "mymensingh": "34",
+  "cumilla": "55",
+  "pabna": "16",
+  "bogura": "10"
+};
+
 const UPAZILA_MAP = {
   "40": [ // Dhaka
     { code: "314", name: "Gulshan" },
@@ -9,7 +24,11 @@ const UPAZILA_MAP = {
     { code: "299", name: "Adabor" },
     { code: "307", name: "Dakshin Khan" },
     { code: "319", name: "Kafrul" },
-    { code: "321", name: "Kamrangir Char" }
+    { code: "321", name: "Kamrangir Char" },
+    { code: "323", name: "Hatirjheel" },
+    { code: "313", name: "Khilgaon" },
+    { code: "318", name: "Mirpur" },
+    { code: "322", name: "Tejgaon" }
   ],
   "23": [ // Jashore
     { code: "155", name: "Abhay Nagar" },
@@ -55,7 +74,10 @@ const UPAZILA_MAP = {
   ],
   "55": [ // Cumilla
     { code: "452", name: "Barura" },
-    { code: "455", name: "Chandina" }
+    { code: "455", name: "Chandina" },
+    { code: "458", name: "Muradnagar" },
+    { code: "456", name: "Daudkandi" },
+    { code: "457", name: "Debidwar" }
   ],
   "16": [ // Pabna
     { code: "120", name: "Atgharia" },
@@ -72,6 +94,8 @@ document.addEventListener("DOMContentLoaded", () => {
   initConditionalFields();
   initDynamicExperiences();
   initAddressSync();
+  initDragAndDrop();
+  initEditorTabs();
   loadSavedProfile();
 
   // Load demo data button
@@ -93,9 +117,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // JSON actions
-  document.getElementById("copyJsonBtn").addEventListener("click", copyJsonToClipboard);
+  // JSON / YAML Editor actions
+  document.getElementById("copyJsonBtn").addEventListener("click", () => copyTextToClipboard("jsonTextarea", "JSON"));
+  document.getElementById("copyYamlBtn").addEventListener("click", () => copyTextToClipboard("yamlTextarea", "YAML"));
   document.getElementById("importJsonBtn").addEventListener("click", importJsonProfile);
+  document.getElementById("importYamlBtn").addEventListener("click", importYamlProfile);
+  document.getElementById("exportJsonBtn").addEventListener("click", () => exportProfile("json"));
+  document.getElementById("exportYamlBtn").addEventListener("click", () => exportProfile("yaml"));
 
   // Form submission
   document.getElementById("profileForm").addEventListener("submit", saveProfile);
@@ -144,10 +172,28 @@ function initTabs() {
       btn.classList.add("active");
       document.getElementById(tabId).classList.add("active");
 
-      // Auto update JSON textarea if backup tab is active
+      // Auto update textareas if backup tab is active
       if (tabId === "backup") {
-        updateJsonTextarea();
+        updateCodeTextareas();
       }
+    });
+  });
+}
+
+// Sub-tabs inside editor panel
+function initEditorTabs() {
+  const tabs = document.querySelectorAll(".editor-tab-btn");
+  const views = document.querySelectorAll(".editor-view");
+
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const format = tab.getAttribute("data-format");
+
+      tabs.forEach(t => t.classList.remove("active"));
+      views.forEach(v => v.classList.remove("active"));
+
+      tab.classList.add("active");
+      document.getElementById(`${format}EditorView`).classList.add("active");
     });
   });
 }
@@ -205,38 +251,80 @@ function initConditionalFields() {
   });
 }
 
-// Handle Dynamic Upazila Populating
-function setupUpazilaDropdown(districtSelectId, upazilaSelectId, selectedUpazilaCode = null) {
-  const districtSelect = document.getElementById(districtSelectId);
-  const upazilaSelect = document.getElementById(upazilaSelectId);
+// Translate district/upazila codes to names for user friendly input display
+function translateCodeToName(fieldId, value) {
+  if (!value) return "";
   
-  if (!districtSelect || !upazilaSelect) return;
+  const stringVal = String(value).trim().toLowerCase();
+
+  // District translation
+  if (fieldId.endsWith("district")) {
+    for (const [name, code] of Object.entries(DISTRICT_TO_CODE)) {
+      if (code === stringVal || name === stringVal) {
+        return name.charAt(0).toUpperCase() + name.slice(1);
+      }
+    }
+  }
+
+  // Upazila translation
+  if (fieldId.endsWith("upazila")) {
+    for (const upazilas of Object.values(UPAZILA_MAP)) {
+      for (const up of upazilas) {
+        if (up.code === stringVal || up.name.toLowerCase() === stringVal) {
+          return up.name;
+        }
+      }
+    }
+  }
+
+  return value; // Return as-is if no mapping found
+}
+
+// Setup Dynamic Upazila Autocomplete Suggestions for Text inputs using datalists
+function setupDynamicUpazilaAutocomplete(districtInputId, upazilaDatalistId) {
+  const districtInput = document.getElementById(districtInputId);
+  const upazilaDatalist = document.getElementById(upazilaDatalistId);
+  
+  if (!districtInput || !upazilaDatalist) return;
 
   const updateUpazilas = () => {
-    const districtVal = districtSelect.value;
-    upazilaSelect.innerHTML = '<option value="" disabled selected>Select Upazila</option>';
+    const val = districtInput.value.trim().toLowerCase();
     
-    if (UPAZILA_MAP[districtVal]) {
-      UPAZILA_MAP[districtVal].forEach(up => {
-        const option = document.createElement("option");
-        option.value = up.code;
-        option.textContent = up.name;
-        if (selectedUpazilaCode && up.code === selectedUpazilaCode.toString()) {
-          option.selected = true;
+    // Check if the value matches either a district code or name
+    let code = null;
+    if (DISTRICT_TO_CODE[val]) {
+      code = DISTRICT_TO_CODE[val];
+    } else {
+      // Find by code directly (e.g. if profile has "40" stored)
+      for (const [name, c] of Object.entries(DISTRICT_TO_CODE)) {
+        if (c === val) {
+          code = c;
+          break;
         }
-        upazilaSelect.appendChild(option);
+      }
+    }
+    
+    upazilaDatalist.innerHTML = "";
+    
+    if (code && UPAZILA_MAP[code]) {
+      UPAZILA_MAP[code].forEach(up => {
+        const option = document.createElement("option");
+        option.value = up.name; // Keep as text name for clean user viewing
+        option.setAttribute("data-code", up.code);
+        upazilaDatalist.appendChild(option);
       });
     }
   };
 
-  districtSelect.addEventListener("change", updateUpazilas);
+  districtInput.addEventListener("input", updateUpazilas);
+  districtInput.addEventListener("change", updateUpazilas);
   updateUpazilas();
 }
 
 // Present and Permanent Address Sync Logic
 function initAddressSync() {
-  setupUpazilaDropdown("present_district", "present_upazila");
-  setupUpazilaDropdown("permanent_district", "permanent_upazila");
+  setupDynamicUpazilaAutocomplete("present_district", "present_upazilas_list");
+  setupDynamicUpazilaAutocomplete("permanent_district", "permanent_upazilas_list");
 
   const syncCheckbox = document.getElementById("same_as_present");
   const permFieldsWrapper = document.getElementById("permanentAddressFields");
@@ -244,7 +332,6 @@ function initAddressSync() {
   syncCheckbox.addEventListener("change", () => {
     if (syncCheckbox.checked) {
       permFieldsWrapper.classList.add("conditional-hide");
-      // Disable required validation check temporarily or clear them
     } else {
       permFieldsWrapper.classList.remove("conditional-hide");
       permFieldsWrapper.classList.add("conditional-show");
@@ -255,8 +342,6 @@ function initAddressSync() {
 // Job Experience dynamically adding/removing rows
 function initDynamicExperiences() {
   const addBtn = document.getElementById("addJobBtn");
-  const container = document.getElementById("experienceList");
-
   addBtn.addEventListener("click", () => {
     addExperienceRow();
   });
@@ -378,6 +463,29 @@ function reindexExperiences() {
   });
 }
 
+// Smart Select population helper to allow mapping values or texts
+function selectSelectOptionSmart(selectEl, value) {
+  if (!selectEl || value === undefined || value === null) return;
+  const stringVal = String(value).trim().toLowerCase();
+  
+  // 1. Exact value match
+  for (let option of selectEl.options) {
+    if (option.value.trim().toLowerCase() === stringVal) {
+      selectEl.value = option.value;
+      return;
+    }
+  }
+  
+  // 2. Exact or partial text match
+  for (let option of selectEl.options) {
+    const text = option.textContent.trim().toLowerCase();
+    if (text === stringVal || text.includes(stringVal) || stringVal.includes(text)) {
+      selectEl.value = option.value;
+      return;
+    }
+  }
+}
+
 // Populate the options form with profile object
 function populateForm(profile) {
   if (!profile) return;
@@ -388,28 +496,31 @@ function populateForm(profile) {
     "nationality", "religion", "gender", "nid", "nid_no", "breg", "breg_no",
     "passport", "passport_no", "marital_status", "spouse_name", "mobile",
     "confirm_mobile", "email", "quota", "quota_details", "dep_status",
-    "present_careof", "present_village", "present_district", "present_post", "present_postcode",
-    "permanent_careof", "permanent_village", "permanent_district", "permanent_post", "permanent_postcode",
+    "present_careof", "present_village", "present_district", "present_upazila", "present_post", "present_postcode",
+    "permanent_careof", "permanent_village", "permanent_district", "permanent_upazila", "permanent_post", "permanent_postcode",
     "ssc_exam", "ssc_roll", "ssc_group", "ssc_board", "ssc_result_type", "ssc_result", "ssc_year",
     "hsc_exam", "hsc_roll", "hsc_group", "hsc_board", "hsc_result_type", "hsc_result", "hsc_year",
-    "gra_exam", "gra_year", "gra_subject", "gra_result_type", "gra_result", "gra_duration",
-    "mas_exam", "mas_year", "mas_subject", "mas_result_type", "mas_result", "mas_duration"
+    "gra_exam", "gra_institute", "gra_year", "gra_subject", "gra_result_type", "gra_result", "gra_duration",
+    "mas_exam", "mas_institute", "mas_year", "mas_subject", "mas_result_type", "mas_result", "mas_duration"
   ];
 
   fields.forEach(f => {
     const el = document.getElementById(f);
     if (el) {
-      el.value = profile[f] || "";
+      let val = profile[f] || "";
+      
+      // Translate code to name for district and upazila to show human-readable text
+      if (f.endsWith("district") || f.endsWith("upazila")) {
+        val = translateCodeToName(f, val);
+      }
+
+      if (el.tagName === "SELECT") {
+        selectSelectOptionSmart(el, val);
+      } else {
+        el.value = val;
+      }
     }
   });
-
-  // Handle present and permanent district/upazila select linking
-  if (profile.present_district) {
-    setupUpazilaDropdown("present_district", "present_upazila", profile.present_upazila);
-  }
-  if (profile.permanent_district) {
-    setupUpazilaDropdown("permanent_district", "permanent_upazila", profile.permanent_upazila);
-  }
 
   // Handle checkboxes
   document.getElementById("same_as_present").checked = !!profile.same_as_present;
@@ -426,10 +537,14 @@ function populateForm(profile) {
   document.getElementById("if_applicable_mas").dispatchEvent(new Event("change"));
   document.getElementById("if_applicable_exp").dispatchEvent(new Event("change"));
 
+  // Trigger autocompleter input events to sync upazila datalists
+  document.getElementById("present_district").dispatchEvent(new Event("input"));
+  document.getElementById("permanent_district").dispatchEvent(new Event("input"));
+
   // Clear and load job experiences
   const expContainer = document.getElementById("experienceList");
   expContainer.innerHTML = "";
-  if (profile.jobs && Array.span !== 0) {
+  if (profile.jobs && profile.jobs.length !== 0) {
     profile.jobs.forEach(job => {
       addExperienceRow(job);
     });
@@ -465,13 +580,6 @@ function gatherProfileData() {
   profile.if_applicable_mas = document.getElementById("if_applicable_mas").checked;
   profile.if_applicable_exp = document.getElementById("if_applicable_exp").checked;
 
-  // Additional fields directly from HTML selects that might need custom read
-  const graInst = document.getElementById("gra_institute");
-  if (graInst) profile.gra_institute = graInst.value;
-
-  const masInst = document.getElementById("mas_institute");
-  if (masInst) profile.mas_institute = masInst.value;
-
   // Job experience list gathering
   profile.jobs = [];
   if (profile.if_applicable_exp) {
@@ -501,6 +609,16 @@ async function loadSavedProfile() {
     if (data && data.profile) {
       populateForm(data.profile);
     }
+  } else {
+    // Local storage fallback for previews
+    const saved = localStorage.getItem("profile");
+    if (saved) {
+      try {
+        populateForm(JSON.parse(saved));
+      } catch (e) {
+        console.error("Local storage parse fail", e);
+      }
+    }
   }
 }
 
@@ -514,24 +632,104 @@ async function saveProfile(e) {
     await chrome.storage.local.set({ profile });
     showToast("Profile settings saved successfully!", "success");
   } else {
-    // Local storage fallback for options preview
     localStorage.setItem("profile", JSON.stringify(profile));
     showToast("Saved to local storage mock profile.", "info");
   }
 }
 
-// Update JSON backup textarea
-function updateJsonTextarea() {
-  const profile = gatherProfileData();
-  document.getElementById("jsonTextarea").value = JSON.stringify(profile, null, 2);
+// Drag and Drop File Upload Sync Setup
+function initDragAndDrop() {
+  const dropZone = document.getElementById("dropZone");
+  const fileInput = document.getElementById("fileInput");
+  const fileSelectBtn = document.getElementById("fileSelectBtn");
+
+  if (!dropZone || !fileInput || !fileSelectBtn) return;
+
+  fileSelectBtn.addEventListener("click", () => fileInput.click());
+
+  fileInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (file) handleUploadedFile(file);
+  });
+
+  dropZone.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropZone.classList.add("dragover");
+  });
+
+  ["dragleave", "drop"].forEach(eventName => {
+    dropZone.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      dropZone.classList.remove("dragover");
+    });
+  });
+
+  dropZone.addEventListener("drop", (e) => {
+    const file = e.dataTransfer.files[0];
+    if (file) handleUploadedFile(file);
+  });
 }
 
-// Copy JSON to clipboard
-function copyJsonToClipboard() {
-  const jsonText = document.getElementById("jsonTextarea");
-  jsonText.select();
+function handleUploadedFile(file) {
+  const reader = new FileReader();
+  const extension = file.name.split(".").pop().toLowerCase();
+
+  reader.onload = (e) => {
+    const content = e.target.result;
+    if (extension === "json") {
+      try {
+        const profile = JSON.parse(content);
+        populateForm(profile);
+        showToast("Profile JSON imported successfully! Click 'Save Profile' below to store.", "success");
+      } catch (err) {
+        showToast("Error parsing JSON file.", "danger");
+      }
+    } else if (extension === "yaml" || extension === "yml") {
+      try {
+        if (typeof jsyaml === "undefined") {
+          showToast("YAML parser library is loading. Try again in a moment.", "warning");
+          return;
+        }
+        const profile = jsyaml.load(content);
+        populateForm(profile);
+        showToast("Profile YAML imported successfully! Click 'Save Profile' below to store.", "success");
+      } catch (err) {
+        showToast("Error parsing YAML file: " + err.message, "danger");
+      }
+    } else {
+      showToast("Unsupported file format. Please upload .json, .yaml, or .yml.", "warning");
+    }
+  };
+
+  reader.readAsText(file);
+}
+
+// Update JSON and YAML backup textareas
+function updateCodeTextareas() {
+  const profile = gatherProfileData();
+  
+  const jsonTextarea = document.getElementById("jsonTextarea");
+  if (jsonTextarea) {
+    jsonTextarea.value = JSON.stringify(profile, null, 2);
+  }
+  
+  const yamlTextarea = document.getElementById("yamlTextarea");
+  if (yamlTextarea && typeof jsyaml !== "undefined") {
+    try {
+      yamlTextarea.value = jsyaml.dump(profile);
+    } catch (e) {
+      console.error("Error dumping YAML:", e);
+    }
+  }
+}
+
+// Copy Text to Clipboard
+function copyTextToClipboard(textareaId, formatName) {
+  const txt = document.getElementById(textareaId);
+  if (!txt) return;
+  txt.select();
   document.execCommand("copy");
-  showToast("Profile JSON copied to clipboard!", "success");
+  showToast(`Profile ${formatName} copied to clipboard!`, "success");
 }
 
 // Import JSON profile
@@ -545,8 +743,62 @@ function importJsonProfile() {
   try {
     const profile = JSON.parse(jsonVal);
     populateForm(profile);
-    showToast("Profile JSON parsed and loaded! Click 'Save Profile' at the bottom to store it.", "success");
+    showToast("Profile JSON parsed and loaded! Click 'Save Profile' below to store.", "success");
   } catch (err) {
     showToast("Invalid JSON syntax. Please verify and try again.", "danger");
   }
+}
+
+// Import YAML profile
+function importYamlProfile() {
+  const yamlVal = document.getElementById("yamlTextarea").value.trim();
+  if (!yamlVal) {
+    showToast("Please paste profile YAML first.", "warning");
+    return;
+  }
+
+  try {
+    if (typeof jsyaml === "undefined") {
+      showToast("YAML parser is not loaded.", "danger");
+      return;
+    }
+    const profile = jsyaml.load(yamlVal);
+    populateForm(profile);
+    showToast("Profile YAML parsed and loaded! Click 'Save Profile' below to store.", "success");
+  } catch (err) {
+    showToast("Invalid YAML syntax: " + err.message, "danger");
+  }
+}
+
+// Export Profile as File Download
+function exportProfile(format) {
+  const profile = gatherProfileData();
+  let content = "";
+  let filename = "chakrifill_profile";
+  let mimeType = "text/plain";
+
+  if (format === "json") {
+    content = JSON.stringify(profile, null, 2);
+    filename += ".json";
+    mimeType = "application/json";
+  } else if (format === "yaml") {
+    if (typeof jsyaml === "undefined") {
+      showToast("YAML library is not loaded.", "danger");
+      return;
+    }
+    content = jsyaml.dump(profile);
+    filename += ".yaml";
+    mimeType = "text/yaml";
+  }
+
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast(`Profile exported as ${format.toUpperCase()}!`, "success");
 }

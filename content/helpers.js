@@ -111,6 +111,10 @@ window.ChakriFillHelpers = window.ChakriFillHelpers || {
   waitForSelectOptions: async (selector, minOptions = 2, maxWaitMs = 1500) => {
     const el = typeof selector === 'string' ? document.querySelector(selector) : selector;
     if (!el) return;
+    
+    // Give the page's event handlers a tiny moment to run and clear/reset options
+    await new Promise(resolve => setTimeout(resolve, 50));
+    
     const startTime = Date.now();
     while (el.options.length < minOptions && (Date.now() - startTime) < maxWaitMs) {
       await new Promise(resolve => setTimeout(resolve, 50));

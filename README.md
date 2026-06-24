@@ -2,10 +2,10 @@
   <img src="assets/banner.png" alt="ChakriFill Banner" width="100%" />
 </p>
 
-<h1 align="center">ChakriFill</h1>
+<h1 align="center">ChakriFill — Bangladesh Job Application Autofill Chrome Extension</h1>
 
 <p align="center">
-  <strong>Smart autofill browser extension for Bangladesh government job applications (Teletalk)</strong>
+  <strong>The ultimate smart autofill extension for Bangladesh government job applications (Teletalk Recruitment Portals) and Alljobs BD.</strong>
 </p>
 
 <p align="center">
@@ -18,7 +18,7 @@
 
 ## ✨ What is ChakriFill?
 
-ChakriFill is a **Chromium browser extension** that automatically fills Bangladesh government job application forms hosted on the **Teletalk** recruitment portal.
+ChakriFill is a modern, high-performance **Chromium browser extension** designed to automatically fill Bangladesh government job application forms hosted on the **Teletalk** web recruitment systems (such as `*.teletalk.com.bd` and `alljobs.teletalk.com.bd`).
 
 Instead of tediously re-entering your name, address, educational qualifications, and job experience every time you apply for a new post, you save your profile **once** and ChakriFill populates the entire form in seconds.
 
@@ -31,8 +31,10 @@ Instead of tediously re-entering your name, address, educational qualifications,
 | **District → Upazila Cascade** | Waits for upazila options to load after district is selected |
 | **Event-Safe Injection** | Dispatches native `input`, `change`, `keyup` events — invisible to form validators |
 | **Smart Captcha Bypass** | Reads the hidden `CAPTCHA_ACTUAL` field and fills the input automatically |
-| **JSON Profile Backup** | Export/import your profile as a JSON file |
+| **JSON & YAML Profiles** | Export, import, and download backups as both JSON and YAML |
+| **Drag & Drop Upload** | Drag and drop .json, .yaml, or .yml files to load profile data instantly |
 | **Glassmorphic UI** | A beautiful settings page with tabbed layout and neon-emerald accents |
+
 
 ---
 
@@ -132,7 +134,7 @@ The ChakriFill icon will now be permanently visible in your toolbar.
 | **Address** | Present address with district + upazila, permanent address (or tick "Same as Present") |
 | **Education** | SSC, HSC, Graduation details — exam type, board, group, result, year |
 | **Experience** | Job history — employment type, designation, dates, organization, description |
-| **Backup** | Export your profile as JSON or import a previously saved one |
+| **Backup** | Drag-and-drop or upload JSON/YAML profile files, edit live with raw code editors, and export/download configurations |
 
 4. Click **"💾 Save Profile"** at the bottom of the page
 5. A green toast confirms your profile is saved
@@ -194,8 +196,10 @@ Scroll through the form to verify the filled values, then submit normally.
 
 ```
 chakri-fill/
-├── manifest.json           # Extension manifest (MV3)
+├── manifest.json           # Extension manifest (MV3) with toolbar icons declared
 ├── form.html               # Local copy of the Teletalk NPA form (for dev/testing)
+├── profile_template.yaml   # Sanitized YAML configuration template
+├── package.json            # Project specifications & test scripts
 ├── assets/
 │   ├── icons/              # Extension icons (16, 48, 128px)
 │   └── banner.png          # Project banner
@@ -219,7 +223,7 @@ chakri-fill/
 │   └── autofill.js         # Entry point — fetches profile, calls matcher
 │
 └── storage/
-    └── defaultProfile.js   # Default/demo profile schema reference
+    └── defaultProfile.js   # Default/demo profile schema reference (fully text-based)
 ```
 
 ---
@@ -279,15 +283,15 @@ All fields saved to `chrome.storage.local` under the key `"profile"`:
 
 | Key | Type | Example | Description |
 |---|---|---|---|
-| `name` | string | `"Maruf Rahman"` | Full name in English |
-| `name_bn` | string | `"মারুফ রহমান"` | Full name in Bangla |
+| `name` | string | `"Rahim Uddin"` | Full name in English |
+| `name_bn` | string | `"রহিম উদ্দিন"` | Full name in Bangla |
 | `father` | string | `"Anisur Rahman"` | Father's name (English) |
 | `father_bn` | string | `"আনিসুর রহমান"` | Father's name (Bangla) |
 | `mother` | string | `"Sufia Begum"` | Mother's name (English) |
 | `mother_bn` | string | `"সুফিয়া বেগম"` | Mother's name (Bangla) |
 | `dob` | string | `"1998-06-15"` | Date of birth (YYYY-MM-DD) |
 | `nationality` | string | `"Bangladeshi"` | Nationality |
-| `religion` | string | `"1"` | Religion code (1=Islam, 2=Hindu…) |
+| `religion` | string | `"Islam"` | Religion name (matched by text) |
 | `gender` | string | `"Male"` | `Male`, `Female`, or `Other` |
 | `nid` | string | `"1"` | Has NID? `1`=Yes, `0`=No |
 | `nid_no` | string | `"5504123456"` | National ID number |
@@ -299,7 +303,7 @@ All fields saved to `chrome.storage.local` under the key `"profile"`:
 | `spouse_name` | string | `""` | Spouse's name (if married) |
 | `mobile` | string | `"01712345678"` | Primary mobile number |
 | `confirm_mobile` | string | `"01712345678"` | Confirm mobile (must match) |
-| `email` | string | `"you@example.com"` | Email address |
+| `email` | string | `"rahim.uddin@example.com"` | Email address |
 | `quota` | string | `"8"` | Quota code (8=Not Applicable) |
 | `quota_details` | string | `""` | Quota detail text (if applicable) |
 | `dep_status` | string | `"5"` | Department status code |
@@ -309,14 +313,14 @@ All fields saved to `chrome.storage.local` under the key `"profile"`:
 <details>
 <summary><strong>Present Address</strong></summary>
 
-| Key | Type | Example |
-|---|---|---|
-| `present_careof` | string | `"Anisur Rahman"` |
-| `present_village` | string | `"House 12, Road 4"` |
-| `present_district` | string | `"40"` (Dhaka) |
-| `present_upazila` | string | `"314"` (Gulshan) |
-| `present_post` | string | `"Gulshan"` |
-| `present_postcode` | string | `"1212"` |
+| Key | Type | Example | Description |
+|---|---|---|---|
+| `present_careof` | string | `"Anisur Rahman"` | Care-of name |
+| `present_village` | string | `"House 12, Road 4"` | Village/street address |
+| `present_district` | string | `"Dhaka"` | District name (smart matched) |
+| `present_upazila` | string | `"Gulshan"` | Upazila name (smart matched) |
+| `present_post` | string | `"Gulshan"` | Post office |
+| `present_postcode` | string | `"1212"` | Post code |
 
 </details>
 
@@ -328,8 +332,8 @@ All fields saved to `chrome.storage.local` under the key `"profile"`:
 | `same_as_present` | boolean | If `true`, copies present address |
 | `permanent_careof` | string | Care-of name |
 | `permanent_village` | string | Village/street address |
-| `permanent_district` | string | District code |
-| `permanent_upazila` | string | Upazila code |
+| `permanent_district` | string | District name (smart matched) |
+| `permanent_upazila` | string | Upazila name (smart matched) |
 | `permanent_post` | string | Post office name |
 | `permanent_postcode` | string | 4-digit post code |
 
@@ -345,11 +349,11 @@ Each level (`ssc_`, `hsc_`, `gra_`, `mas_`) follows the same pattern:
 | `_exam` | `"1"` | Exam type code |
 | `_roll` | `"102938"` | Roll number |
 | `_group` or `_subject` | `"Science"` | Group/subject text or code |
-| `_board` | `"14"` | Board code (14=Dhaka) |
+| `_board` | `"Dhaka"` | Board name (smart matched) |
 | `_result_type` | `"5"` | Result type (5=GPA/5, 4=CGPA/4) |
 | `_result` | `"5.00"` | GPA/CGPA value |
 | `_year` | `"2014"` | Passing year |
-| `_institute` | `"168"` | Institute code (GRA/MAS only) |
+| `_institute` | `"Dhaka University"` | Institute name (smart matched, GRA/MAS only) |
 | `_duration` | `"04"` | Course duration in years |
 
 Use `if_applicable_mas: true` to enable the Masters section.
@@ -387,7 +391,26 @@ Use `if_applicable_mas: true` to enable the Masters section.
 
 ## 🧪 Testing Locally
 
+### 1. Automated Unit Tests
+
+ChakriFill includes a built-in unit test suite to verify profile schema parsing, YAML-to-JSON translation, smart selection matching, and upazila/district translation mapping.
+
+You can run the tests using Node.js directly from your terminal:
+
+```bash
+node tests/run.js
+```
+
+Or using npm:
+
+```bash
+npm test
+```
+
+### 2. Manual Form Testing
+
 You can test the autofill engine directly against the bundled `form.html` file **without** installing the extension:
+
 
 **1. Open the form**
 
