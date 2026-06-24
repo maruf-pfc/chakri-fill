@@ -336,24 +336,13 @@ window.ChakriFillMatcher = window.ChakriFillMatcher || {
     }
 
     // ==========================================
-    // 9. Premium Quality of Life: Captcha & Declarations
+    // 9. Premium Quality of Life: Declarations
     // ==========================================
     try {
-      // Fetch and solve captcha if available in hidden element
-      const captchaActualEl = document.getElementById('CAPTCHA_ACTUAL');
-      const captchaInputEl = document.getElementById('captcha');
-      
-      if (captchaActualEl && captchaActualEl.value && captchaInputEl) {
-        console.log("ChakriFill: Smart Captcha Bypass Activated!");
-        captchaInputEl.value = captchaActualEl.value;
-        H.dispatchEvent(captchaInputEl, 'input');
-        H.dispatchEvent(captchaInputEl, 'change');
-      }
-
       // Check declaration check box
       H.setCheckbox('#agree', true);
     } catch (e) {
-      console.error("ChakriFill: Error populating Captcha/Declaration section:", e);
+      console.error("ChakriFill: Error populating Declaration section:", e);
     }
 
     console.log("ChakriFill: Autofill engine successfully completed form population!");
