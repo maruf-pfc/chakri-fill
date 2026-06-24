@@ -2,7 +2,7 @@
   <img src="assets/banner.png" alt="ChakriFill Banner" width="100%" />
 </p>
 
-<h1 align="center">ChakriFill — Bangladesh Job Application Autofill Chrome Extension</h1>
+<h1 align="center">ChakriFill - Bangladesh Job Application Autofill Chrome Extension</h1>
 
 <p align="center">
   <strong>The ultimate smart autofill extension for Bangladesh government job applications (Teletalk Recruitment Portals) and Alljobs BD.</strong>
@@ -12,8 +12,7 @@
   <img alt="Manifest Version" src="https://img.shields.io/badge/Manifest-v3-10b981?style=flat-square&logo=googlechrome&logoColor=white" />
   <img alt="License" src="https://img.shields.io/badge/License-GPLv3-06b6d4?style=flat-square" />
   <img alt="Platform" src="https://img.shields.io/badge/Platform-Chromium-8b5cf6?style=flat-square&logo=googlechrome&logoColor=white" />
-  <img alt="Status" src="https://img.shields.io/badge/Status-Developer%20Preview-f59e0b?style=flat-square" />
-  <img alt="Not on Web Store" src="https://img.shields.io/badge/Web%20Store-Not%20Published-ef4444?style=flat-square&logo=googlechrome&logoColor=white" />
+  <img alt="Status" src="https://img.shields.io/badge/Status-Release--Ready-10b981?style=flat-square" />
 </p>
 
 ## ✨ What is ChakriFill?
@@ -492,11 +491,12 @@ Then load and run `content/matcher.js` followed by `content/autofill.js` in the 
 
 ---
 
-## 🔒 Privacy
+## 🔒 Security & Privacy
 
-- **All data stays local.** ChakriFill stores your profile exclusively in `chrome.storage.local` — it never leaves your device.
-- **No analytics, no telemetry, no network requests** are made by this extension.
-- The extension only injects scripts on-demand (when you click "Autofill"), never automatically.
+- **On-Disk Client-Side Encryption:** Your profile data is stored securely on your local computer. It is encrypted on-disk using industry-standard **AES-256 (AES-GCM)** encryption via the native browser Web Crypto API.
+- **Zero Network Transmission:** ChakriFill has **no backend servers**, collects **no analytics or telemetry**, and does **not** transmit any data over the internet.
+- **Strict Permission Scope:** The extension operates under the "Least Privilege" principle. Host permissions are strictly restricted to `*://*.teletalk.com.bd/*` (the official Bangladesh Teletalk job application portals), ensuring it has no access to any other websites.
+- **On-Demand Execution:** Script injection occurs **only** when you explicitly click the "Autofill" button. The extension never runs in the background or monitors your browsing activity.
 
 ---
 

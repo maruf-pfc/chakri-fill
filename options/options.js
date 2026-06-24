@@ -771,23 +771,29 @@ async function loadSavedProfile() {
     // Local storage fallback for previews
     try {
       data = {
-        profiles: JSON.parse(localStorage.getItem("profiles")),
+        profiles: localStorage.getItem("profiles"),
         activeProfileName: localStorage.getItem("activeProfileName"),
-        profile: JSON.parse(localStorage.getItem("profile"))
+        profile: localStorage.getItem("profile")
       };
     } catch (e) {}
   }
 
-  // Schema migration and backwards compatibility check
-  if (data.profiles && Object.keys(data.profiles).length > 0) {
-    allProfiles = data.profiles;
-  } else if (data.profile && Object.keys(data.profile).length > 0) {
-    allProfiles = { "Default": data.profile };
+  const key = await window.ChakriFillSecurity.getOrCreateKey();
+
+  // Decrypt profiles collection
+  if (data.profiles) {
+    allProfiles = await window.ChakriFillSecurity.decryptProfiles(data.profiles, key);
+  } else if (data.profile) {
+    const singleDecrypted = await window.ChakriFillSecurity.decryptSingleProfile(data.profile, key);
+    allProfiles = { "Default": singleDecrypted };
   } else {
     allProfiles = { "Default": typeof DEFAULT_PROFILE !== "undefined" ? DEFAULT_PROFILE : {} };
   }
 
-  currentProfileName = data.activeProfileName || "Default";
+  currentProfileName = (typeof chrome !== "undefined" && chrome.storage)
+    ? (data.activeProfileName || "Default")
+    : (localStorage.getItem("activeProfileName") || "Default");
+
   if (!allProfiles[currentProfileName]) {
     currentProfileName = Object.keys(allProfiles)[0] || "Default";
   }
@@ -822,18 +828,22 @@ async function saveProfile(e) {
   const profile = gatherProfileData();
   allProfiles[currentProfileName] = profile;
   
+  const key = await window.ChakriFillSecurity.getOrCreateKey();
+  const encryptedProfiles = await window.ChakriFillSecurity.encryptProfiles(allProfiles, key);
+  const encryptedProfile = await window.ChakriFillSecurity.encryptSingleProfile(profile, key);
+
   if (typeof chrome !== "undefined" && chrome.storage) {
     await chrome.storage.local.set({
-      profiles: allProfiles,
+      profiles: encryptedProfiles,
       activeProfileName: currentProfileName,
-      profile: profile // Sync for backwards-compatibility
+      profile: encryptedProfile // Sync for backwards-compatibility
     });
-    showToast(`Profile "${currentProfileName}" saved successfully!`, "success");
+    showToast(`Profile "${currentProfileName}" saved securely!`, "success");
   } else {
-    localStorage.setItem("profiles", JSON.stringify(allProfiles));
+    localStorage.setItem("profiles", encryptedProfiles);
     localStorage.setItem("activeProfileName", currentProfileName);
-    localStorage.setItem("profile", JSON.stringify(profile));
-    showToast(`Saved "${currentProfileName}" to mock local storage.`, "info");
+    localStorage.setItem("profile", encryptedProfile);
+    showToast(`Saved "${currentProfileName}" securely to mock local storage.`, "info");
   }
 
   // Refresh live editors
@@ -850,17 +860,21 @@ async function handleProfileChange(e) {
     currentProfileName = selected;
     populateForm(allProfiles[selected]);
 
+    const key = await window.ChakriFillSecurity.getOrCreateKey();
+    const encryptedProfiles = await window.ChakriFillSecurity.encryptProfiles(allProfiles, key);
+    const encryptedProfile = await window.ChakriFillSecurity.encryptSingleProfile(allProfiles[currentProfileName], key);
+
     // Save active state to storage
     if (typeof chrome !== "undefined" && chrome.storage) {
       await chrome.storage.local.set({
-        profiles: allProfiles,
+        profiles: encryptedProfiles,
         activeProfileName: currentProfileName,
-        profile: allProfiles[currentProfileName]
+        profile: encryptedProfile
       });
     } else {
-      localStorage.setItem("profiles", JSON.stringify(allProfiles));
+      localStorage.setItem("profiles", encryptedProfiles);
       localStorage.setItem("activeProfileName", currentProfileName);
-      localStorage.setItem("profile", JSON.stringify(allProfiles[currentProfileName]));
+      localStorage.setItem("profile", encryptedProfile);
     }
 
     showToast(`Switched to profile: ${selected}`, "info");
@@ -933,17 +947,21 @@ async function handleDeleteProfile() {
   populateForm(allProfiles[currentProfileName]);
   showToast("Profile deleted.", "warning");
 
+  const key = await window.ChakriFillSecurity.getOrCreateKey();
+  const encryptedProfiles = await window.ChakriFillSecurity.encryptProfiles(allProfiles, key);
+  const encryptedProfile = await window.ChakriFillSecurity.encryptSingleProfile(allProfiles[currentProfileName], key);
+
   // Save updated profiles
   if (typeof chrome !== "undefined" && chrome.storage) {
     await chrome.storage.local.set({
-      profiles: allProfiles,
+      profiles: encryptedProfiles,
       activeProfileName: currentProfileName,
-      profile: allProfiles[currentProfileName]
+      profile: encryptedProfile
     });
   } else {
-    localStorage.setItem("profiles", JSON.stringify(allProfiles));
+    localStorage.setItem("profiles", encryptedProfiles);
     localStorage.setItem("activeProfileName", currentProfileName);
-    localStorage.setItem("profile", JSON.stringify(allProfiles[currentProfileName]));
+    localStorage.setItem("profile", encryptedProfile);
   }
   
   updateCodeTextareas();

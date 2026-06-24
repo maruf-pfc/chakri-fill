@@ -13,9 +13,14 @@
   
   try {
     const data = await chrome.storage.local.get("profile");
-    const profile = data.profile;
+    let profile = data.profile;
 
-    if (!profile) {
+    if (profile && window.ChakriFillSecurity) {
+      const key = await window.ChakriFillSecurity.getOrCreateKey();
+      profile = await window.ChakriFillSecurity.decryptSingleProfile(profile, key);
+    }
+
+    if (!profile || Object.keys(profile).length === 0) {
       alert("Please setup your ChakriFill profile first in the extension options page.");
       return;
     }

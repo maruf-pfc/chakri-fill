@@ -16,24 +16,35 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Load profile state
   async function loadProfileState() {
+    let rawProfiles, rawActiveProfileName, rawProfile;
+
     if (typeof chrome !== "undefined" && chrome.storage) {
       const data = await chrome.storage.local.get(["profiles", "activeProfileName", "profile"]);
-      profiles = data.profiles || {};
-      activeProfileName = data.activeProfileName || "Default";
-      
-      // Migration fallback for existing single profile
-      if (data.profile && Object.keys(profiles).length === 0) {
-        profiles[activeProfileName] = data.profile;
-        await chrome.storage.local.set({ profiles, activeProfileName });
-      }
+      rawProfiles = data.profiles;
+      rawActiveProfileName = data.activeProfileName;
+      rawProfile = data.profile;
     } else {
       // Local storage fallback for local development/previews
       try {
-        profiles = JSON.parse(localStorage.getItem("profiles")) || { "Default": {} };
-        activeProfileName = localStorage.getItem("activeProfileName") || "Default";
+        rawProfiles = localStorage.getItem("profiles");
+        rawActiveProfileName = localStorage.getItem("activeProfileName");
+        rawProfile = localStorage.getItem("profile");
       } catch (e) {}
     }
 
+    const key = await window.ChakriFillSecurity.getOrCreateKey();
+    
+    // Decrypt profiles collection
+    if (rawProfiles) {
+      profiles = await window.ChakriFillSecurity.decryptProfiles(rawProfiles, key);
+    } else if (rawProfile) {
+      const decryptedSingle = await window.ChakriFillSecurity.decryptSingleProfile(rawProfile, key);
+      profiles = { "Default": decryptedSingle };
+    } else {
+      profiles = { "Default": {} };
+    }
+
+    activeProfileName = rawActiveProfileName || "Default";
     if (!profiles[activeProfileName]) {
       activeProfileName = Object.keys(profiles)[0] || "Default";
     }
@@ -96,15 +107,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         activeProfileName = selected;
         profile = profiles[selected];
         
+        const key = await window.ChakriFillSecurity.getOrCreateKey();
+        const encryptedProfile = await window.ChakriFillSecurity.encryptSingleProfile(profile, key);
+
         // Save choice
         if (typeof chrome !== "undefined" && chrome.storage) {
           await chrome.storage.local.set({
             activeProfileName: activeProfileName,
-            profile: profile // Sync for injection compatibility
+            profile: encryptedProfile // Sync for injection compatibility
           });
         } else {
           localStorage.setItem("activeProfileName", activeProfileName);
-          localStorage.setItem("profile", JSON.stringify(profile));
+          localStorage.setItem("profile", encryptedProfile);
         }
         
         updateUIPreview();
@@ -145,6 +159,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       await chrome.scripting.executeScript({
         target: { tabId: tab.id },
         files: [
+          "content/security.js",
           "content/helpers.js",
           "content/matcher.js",
           "content/autofill.js"
