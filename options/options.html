@@ -13,7 +13,7 @@
     <div class="container">
       <header>
         <div class="brand">
-          <div class="brand-logo">CF</div>
+          <img src="../assets/icons/icon48.png" alt="ChakriFill Logo" class="brand-logo-img" />
           <div class="brand-details">
             <h1>ChakriFill Profile</h1>
             <p>Smart job application autofill manager for Bangladesh</p>
@@ -287,11 +287,16 @@
                 <div class="form-grid-3">
                   <div class="form-group">
                     <label for="present_district">District <span class="required-badge">*</span></label>
-                    <input type="text" id="present_district" list="districts_list" required placeholder="e.g. Dhaka" />
+                    <select id="present_district" required>
+                      <option value="" disabled selected>Select District</option>
+                    </select>
                   </div>
                   <div class="form-group">
                     <label for="present_upazila">Upazila/P.S. <span class="required-badge">*</span></label>
-                    <input type="text" id="present_upazila" list="present_upazilas_list" required placeholder="e.g. Hatirjheel" />
+                    <select id="present_upazila" required>
+                      <option value="" disabled selected>Select Upazila/P.S.</option>
+                    </select>
+                    <input type="text" id="present_upazila_custom" class="conditional-hide" style="margin-top: 8px;" placeholder="Or type custom Upazila/P.S. here" />
                   </div>
                   <div class="form-group">
                     <label for="present_postcode">Post Code <span class="required-badge">*</span></label>
@@ -330,11 +335,16 @@
                   <div class="form-grid-3">
                     <div class="form-group">
                       <label for="permanent_district">District <span class="required-badge">*</span></label>
-                      <input type="text" id="permanent_district" list="districts_list" placeholder="e.g. Cumilla" />
+                      <select id="permanent_district">
+                        <option value="" disabled selected>Select District</option>
+                      </select>
                     </div>
                     <div class="form-group">
                       <label for="permanent_upazila">Upazila/P.S. <span class="required-badge">*</span></label>
-                      <input type="text" id="permanent_upazila" list="permanent_upazilas_list" placeholder="e.g. Muradnagar" />
+                      <select id="permanent_upazila">
+                        <option value="" disabled selected>Select Upazila/P.S.</option>
+                      </select>
+                      <input type="text" id="permanent_upazila_custom" class="conditional-hide" style="margin-top: 8px;" placeholder="Or type custom Upazila/P.S. here" />
                     </div>
                     <div class="form-group">
                       <label for="permanent_postcode">Post Code <span class="required-badge">*</span></label>
@@ -390,7 +400,10 @@
                 <div class="form-grid-3">
                   <div class="form-group">
                     <label for="ssc_board">Board <span class="required-badge">*</span></label>
-                    <input type="text" id="ssc_board" list="boards_list" required placeholder="e.g. Dhaka" />
+                    <select id="ssc_board" required>
+                      <option value="" disabled selected>Select Board</option>
+                    </select>
+                    <input type="text" id="ssc_board_custom" class="conditional-hide" style="margin-top: 8px;" placeholder="Or type custom Board here" />
                   </div>
                   <div class="form-group">
                     <label for="ssc_result_type">Result Type <span class="required-badge">*</span></label>
@@ -472,7 +485,10 @@
                 <div class="form-grid-3">
                   <div class="form-group">
                     <label for="hsc_board">Board <span class="required-badge">*</span></label>
-                    <input type="text" id="hsc_board" list="boards_list" required placeholder="e.g. Dhaka" />
+                    <select id="hsc_board" required>
+                      <option value="" disabled selected>Select Board</option>
+                    </select>
+                    <input type="text" id="hsc_board_custom" class="conditional-hide" style="margin-top: 8px;" placeholder="Or type custom Board here" />
                   </div>
                   <div class="form-group">
                     <label for="hsc_result_type">Result Type <span class="required-badge">*</span></label>
@@ -535,11 +551,17 @@
                   </div>
                   <div class="form-group">
                     <label for="gra_institute">University/Inst. <span class="required-badge">*</span></label>
-                    <input type="text" id="gra_institute" list="universities_list" required placeholder="e.g. Green University" />
+                    <select id="gra_institute" required>
+                      <option value="" disabled selected>Select University</option>
+                    </select>
+                    <input type="text" id="gra_institute_custom" class="conditional-hide" style="margin-top: 8px;" placeholder="Or type custom University here" />
                   </div>
                   <div class="form-group">
                     <label for="gra_subject">Subject / Degree <span class="required-badge">*</span></label>
-                    <input type="text" id="gra_subject" list="subjects_list" required placeholder="e.g. Computer Science & Engineering" />
+                    <select id="gra_subject" required>
+                      <option value="" disabled selected>Select Subject</option>
+                    </select>
+                    <input type="text" id="gra_subject_custom" class="conditional-hide" style="margin-top: 8px;" placeholder="Or type custom Subject here" />
                   </div>
                 </div>
 
@@ -616,11 +638,17 @@
                     </div>
                     <div class="form-group">
                       <label for="mas_institute">University/Inst. <span class="required-badge">*</span></label>
-                      <input type="text" id="mas_institute" list="universities_list" placeholder="e.g. Dhaka University" />
+                      <select id="mas_institute">
+                        <option value="" disabled selected>Select University</option>
+                      </select>
+                      <input type="text" id="mas_institute_custom" class="conditional-hide" style="margin-top: 8px;" placeholder="Or type custom University here" />
                     </div>
                     <div class="form-group">
                       <label for="mas_subject">Subject / Degree <span class="required-badge">*</span></label>
-                      <input type="text" id="mas_subject" list="subjects_list" placeholder="e.g. Computer Science" />
+                      <select id="mas_subject">
+                        <option value="" disabled selected>Select Subject</option>
+                      </select>
+                      <input type="text" id="mas_subject_custom" class="conditional-hide" style="margin-top: 8px;" placeholder="Or type custom Subject here" />
                     </div>
                   </div>
 
@@ -839,6 +867,7 @@
     <!-- Scripts -->
     <script src="js-yaml.min.js"></script>
     <script src="../storage/defaultProfile.js"></script>
+    <script src="geo_data.js"></script>
     <script src="options.js"></script>
   </body>
 </html>

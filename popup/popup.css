@@ -48,18 +48,12 @@ header {
   padding-bottom: 0.75rem;
 }
 
-.logo {
+.logo-img {
   width: 38px;
   height: 38px;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 1.3rem;
-  color: #fff;
+  border-radius: 8px;
   box-shadow: 0 0 15px rgba(16, 185, 129, 0.25);
+  object-fit: contain;
 }
 
 .title-section h1 {

@@ -1,95 +1,265 @@
-// Dynamic Upazila Mapping based on popular districts from form.html
-const DISTRICT_TO_CODE = {
-  "dhaka": "40",
-  "jashore": "23",
-  "chattogram": "60",
-  "khulna": "25",
-  "rajshahi": "14",
-  "sylhet": "51",
-  "barishal": "29",
-  "rangpur": "6",
-  "mymensingh": "34",
-  "cumilla": "55",
-  "pabna": "16",
-  "bogura": "10"
-};
+// Academic options lists
+const ACADEMIC_BOARDS = [
+  "Dhaka",
+  "Cumilla",
+  "Rajshahi",
+  "Jashore",
+  "Chittagong",
+  "Barishal",
+  "Sylhet",
+  "Dinajpur",
+  "Mymensingh",
+  "Madrasah",
+  "Technical (BTEB)",
+  "Open University",
+  "The State Medical Faculty of Bangladesh",
+  "Pharmacy Council of Bangladesh",
+  "Cambridge International - IGCE",
+  "Edexcel International"
+];
 
-const UPAZILA_MAP = {
-  "40": [ // Dhaka
-    { code: "314", name: "Gulshan" },
-    { code: "311", name: "Dhanmondi" },
-    { code: "305", name: "Cantonment" },
-    { code: "320", name: "Kalabagan" },
-    { code: "301", name: "Badda" },
-    { code: "299", name: "Adabor" },
-    { code: "307", name: "Dakshin Khan" },
-    { code: "319", name: "Kafrul" },
-    { code: "321", name: "Kamrangir Char" },
-    { code: "323", name: "Hatirjheel" },
-    { code: "313", name: "Khilgaon" },
-    { code: "318", name: "Mirpur" },
-    { code: "322", name: "Tejgaon" }
-  ],
-  "23": [ // Jashore
-    { code: "155", name: "Abhay Nagar" },
-    { code: "156", name: "Bagherpara" },
-    { code: "157", name: "Chowghacha" },
-    { code: "158", name: "Jhikargacha" },
-    { code: "159", name: "Keshabpur" }
-  ],
-  "60": [ // Chattogram
-    { code: "496", name: "Anowara" },
-    { code: "497", name: "Bakalia" },
-    { code: "499", name: "Banshkhali" },
-    { code: "503", name: "Chandgaon" }
-  ],
-  "25": [ // Khulna
-    { code: "170", name: "Batiaghata" },
-    { code: "171", name: "Dacope" },
-    { code: "172", name: "Daulatpur" },
-    { code: "174", name: "Dumuria" }
-  ],
-  "14": [ // Rajshahi
-    { code: "99", name: "Bagha" },
-    { code: "100", name: "Baghmara" },
-    { code: "101", name: "Boalia" }
-  ],
-  "51": [ // Sylhet
-    { code: "417", name: "Balaganj" },
-    { code: "418", name: "Beanibazar" },
-    { code: "419", name: "Bishwanath" }
-  ],
-  "29": [ // Barishal
-    { code: "204", name: "Agailihara" },
-    { code: "205", name: "Babuganj" },
-    { code: "208", name: "Barishal Sadar" }
-  ],
-  "6": [ // Rangpur
-    { code: "35", name: "Badarganj" },
-    { code: "36", name: "Gangachara" }
-  ],
-  "34": [ // Mymensingh
-    { code: "243", name: "Bhalukha" },
-    { code: "246", name: "Gaffargaon" }
-  ],
-  "55": [ // Cumilla
-    { code: "452", name: "Barura" },
-    { code: "455", name: "Chandina" },
-    { code: "458", name: "Muradnagar" },
-    { code: "456", name: "Daudkandi" },
-    { code: "457", name: "Debidwar" }
-  ],
-  "16": [ // Pabna
-    { code: "120", name: "Atgharia" },
-    { code: "125", name: "Ishwardi" }
-  ],
-  "10": [ // Bogura
-    { code: "65", name: "Adamdighi" },
-    { code: "66", name: "Bogura Sadar" }
-  ]
-};
+const UNIVERSITIES = [
+  "Dhaka University (DU)",
+  "Bangladesh Univ. of Engineering & Tech (BUET)",
+  "Rajshahi University (RU)",
+  "Chittagong University (CU)",
+  "Jahangirnagar University (JU)",
+  "Jagannath University (JnU)",
+  "Shahjalal Univ. of Science & Tech (SUST)",
+  "Khulna University of Eng. & Tech (KUET)",
+  "Rajshahi University of Eng. & Tech (RUET)",
+  "Chittagong Univ. of Eng. & Tech (CUET)",
+  "National University (NU)",
+  "Green University of Bangladesh",
+  "North South University",
+  "BRAC University",
+  "American International University-Bangladesh (AIUB)",
+  "Independent University Bangladesh (IUB)",
+  "Daffodil International University (DIU)"
+];
+
+const SUBJECTS = [
+  "Computer Science & Engineering",
+  "Electrical & Electronic Engineering",
+  "Civil Engineering",
+  "Mechanical Engineering",
+  "Business Administration",
+  "English",
+  "Economics",
+  "Physics",
+  "Chemistry",
+  "Mathematics",
+  "Arts / Humanities",
+  "Social Science",
+  "Commerce / Business Studies"
+];
+
+// Custom fields mapping
+const customSelectFields = [
+  { select: "present_upazila", custom: "present_upazila_custom" },
+  { select: "permanent_upazila", custom: "permanent_upazila_custom" },
+  { select: "ssc_board", custom: "ssc_board_custom" },
+  { select: "hsc_board", custom: "hsc_board_custom" },
+  { select: "gra_institute", custom: "gra_institute_custom" },
+  { select: "gra_subject", custom: "gra_subject_custom" },
+  { select: "mas_institute", custom: "mas_institute_custom" },
+  { select: "mas_subject", custom: "mas_subject_custom" }
+];
+
+// Helper to populate select elements and handle the custom input toggle
+function setupSelectWithCustom(selectId, customInputId, optionsArray, defaultLabel) {
+  const select = document.getElementById(selectId);
+  const customInput = document.getElementById(customInputId);
+  if (!select || !customInput) return;
+  
+  select.innerHTML = `<option value="" disabled selected>${defaultLabel}</option>`;
+  optionsArray.forEach(optVal => {
+    const opt = document.createElement("option");
+    opt.value = optVal;
+    opt.textContent = optVal;
+    select.appendChild(opt);
+  });
+  
+  const optOther = document.createElement("option");
+  optOther.value = "Other";
+  optOther.textContent = "Other / Custom";
+  select.appendChild(optOther);
+  
+  select.addEventListener("change", () => {
+    if (select.value === "Other") {
+      customInput.classList.remove("conditional-hide");
+      customInput.classList.add("conditional-show");
+      customInput.setAttribute("required", "");
+    } else {
+      customInput.classList.remove("conditional-show");
+      customInput.classList.add("conditional-hide");
+      customInput.removeAttribute("required");
+      customInput.value = "";
+    }
+  });
+}
+
+// Populate District selects dynamically
+function populateDistrictDropdowns() {
+  const presentDistrictSelect = document.getElementById("present_district");
+  const permanentDistrictSelect = document.getElementById("permanent_district");
+  if (!presentDistrictSelect || !permanentDistrictSelect) return;
+  
+  presentDistrictSelect.innerHTML = '<option value="" disabled selected>Select District</option>';
+  permanentDistrictSelect.innerHTML = '<option value="" disabled selected>Select District</option>';
+  
+  const sortedNames = Object.keys(DISTRICT_TO_CODE).sort().map(name => {
+    if (name === "cox`s bazar") return "Cox's Bazar";
+    return name.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  });
+  
+  sortedNames.forEach(name => {
+    const optPresent = document.createElement("option");
+    optPresent.value = name;
+    optPresent.textContent = name;
+    presentDistrictSelect.appendChild(optPresent);
+    
+    const optPerm = document.createElement("option");
+    optPerm.value = name;
+    optPerm.textContent = name;
+    permanentDistrictSelect.appendChild(optPerm);
+  });
+}
+
+// Setup Cascading Upazilas dropdowns
+function setupCascadingDropdowns() {
+  const setupCascade = (districtId, upazilaId, customId) => {
+    const districtSelect = document.getElementById(districtId);
+    const upazilaSelect = document.getElementById(upazilaId);
+    const customInput = document.getElementById(customId);
+    if (!districtSelect || !upazilaSelect || !customInput) return;
+    
+    const updateUpazilas = () => {
+      const distName = districtSelect.value.trim().toLowerCase().replace("'", "`");
+      const code = DISTRICT_TO_CODE[distName];
+      
+      upazilaSelect.innerHTML = '<option value="" disabled selected>Select Upazila/P.S.</option>';
+      customInput.classList.add("conditional-hide");
+      customInput.removeAttribute("required");
+      customInput.value = "";
+      
+      if (code && UPAZILA_MAP[code]) {
+        UPAZILA_MAP[code].forEach(upName => {
+          const opt = document.createElement("option");
+          opt.value = upName;
+          opt.textContent = upName;
+          upazilaSelect.appendChild(opt);
+        });
+      }
+      
+      const optOther = document.createElement("option");
+      optOther.value = "Other";
+      optOther.textContent = "Other / Custom";
+      upazilaSelect.appendChild(optOther);
+    };
+    
+    districtSelect.addEventListener("change", updateUpazilas);
+    
+    upazilaSelect.addEventListener("change", () => {
+      if (upazilaSelect.value === "Other") {
+        customInput.classList.remove("conditional-hide");
+        customInput.classList.add("conditional-show");
+        customInput.setAttribute("required", "");
+      } else {
+        customInput.classList.remove("conditional-show");
+        customInput.classList.add("conditional-hide");
+        customInput.removeAttribute("required");
+        customInput.value = "";
+      }
+    });
+  };
+  
+  setupCascade("present_district", "present_upazila", "present_upazila_custom");
+  setupCascade("permanent_district", "permanent_upazila", "permanent_upazila_custom");
+}
+
+// Helper to set select value or fall back to custom text field
+function setSelectOrCustomValue(selectId, customInputId, value) {
+  const select = document.getElementById(selectId);
+  const customInput = document.getElementById(customInputId);
+  if (!select) return;
+  
+  if (!value) {
+    select.value = "";
+    if (customInput) {
+      customInput.value = "";
+      customInput.classList.remove("conditional-show");
+      customInput.classList.add("conditional-hide");
+      customInput.removeAttribute("required");
+    }
+    return;
+  }
+  
+  const stringVal = String(value).trim().toLowerCase();
+  
+  // Try to find exact or partial match in select options (case-insensitive)
+  let found = false;
+  for (let option of select.options) {
+    if (option.value.trim().toLowerCase() === stringVal) {
+      select.value = option.value;
+      found = true;
+      break;
+    }
+  }
+  
+  if (!found) {
+    // Check if there is an "Other" option in select
+    let otherOption = null;
+    for (let option of select.options) {
+      if (option.value === "Other") {
+        otherOption = option;
+        break;
+      }
+    }
+    
+    if (otherOption) {
+      select.value = "Other";
+      if (customInput) {
+        customInput.value = value;
+        customInput.classList.remove("conditional-hide");
+        customInput.classList.add("conditional-show");
+        customInput.setAttribute("required", "");
+      }
+    } else {
+      select.value = "";
+    }
+  } else {
+    if (customInput) {
+      customInput.value = "";
+      customInput.classList.remove("conditional-show");
+      customInput.classList.add("conditional-hide");
+      customInput.removeAttribute("required");
+    }
+  }
+}
+
+// Helper to get select value or custom text input if Other is selected
+function getSelectOrCustomValue(selectId, customInputId) {
+  const select = document.getElementById(selectId);
+  const customInput = document.getElementById(customInputId);
+  if (!select) return "";
+  if (select.value === "Other" && customInput) {
+    return customInput.value.trim();
+  }
+  return select.value;
+}
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Initialize Dropdowns
+  populateDistrictDropdowns();
+  setupCascadingDropdowns();
+  setupSelectWithCustom("ssc_board", "ssc_board_custom", ACADEMIC_BOARDS, "Select Board");
+  setupSelectWithCustom("hsc_board", "hsc_board_custom", ACADEMIC_BOARDS, "Select Board");
+  setupSelectWithCustom("gra_institute", "gra_institute_custom", UNIVERSITIES, "Select University");
+  setupSelectWithCustom("mas_institute", "mas_institute_custom", UNIVERSITIES, "Select University");
+  setupSelectWithCustom("gra_subject", "gra_subject_custom", SUBJECTS, "Select Subject");
+  setupSelectWithCustom("mas_subject", "mas_subject_custom", SUBJECTS, "Select Subject");
+
   initTabs();
   initConditionalFields();
   initDynamicExperiences();
@@ -113,6 +283,16 @@ document.addEventListener("DOMContentLoaded", () => {
     if (confirm("Are you sure you want to clear your current profile details?")) {
       document.getElementById("profileForm").reset();
       document.getElementById("experienceList").innerHTML = "";
+      // Reset all custom inputs to hidden
+      customSelectFields.forEach(f => {
+        const customInput = document.getElementById(f.custom);
+        if (customInput) {
+          customInput.value = "";
+          customInput.classList.remove("conditional-show");
+          customInput.classList.add("conditional-hide");
+          customInput.removeAttribute("required");
+        }
+      });
       showToast("Form cleared.", "warning");
     }
   });
@@ -134,6 +314,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Form submission
   document.getElementById("profileForm").addEventListener("submit", saveProfile);
 });
+
 
 // Toast Notifications System
 function showToast(message, type = "success") {
@@ -267,7 +448,8 @@ function translateCodeToName(fieldId, value) {
   if (fieldId.endsWith("district")) {
     for (const [name, code] of Object.entries(DISTRICT_TO_CODE)) {
       if (code === stringVal || name === stringVal) {
-        return name.charAt(0).toUpperCase() + name.slice(1);
+        if (name === "cox`s bazar") return "Cox's Bazar";
+        return name.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
       }
     }
   }
@@ -275,9 +457,9 @@ function translateCodeToName(fieldId, value) {
   // Upazila translation
   if (fieldId.endsWith("upazila")) {
     for (const upazilas of Object.values(UPAZILA_MAP)) {
-      for (const up of upazilas) {
-        if (up.code === stringVal || up.name.toLowerCase() === stringVal) {
-          return up.name;
+      for (const upName of upazilas) {
+        if (upName.toLowerCase() === stringVal) {
+          return upName;
         }
       }
     }
@@ -286,52 +468,8 @@ function translateCodeToName(fieldId, value) {
   return value; // Return as-is if no mapping found
 }
 
-// Setup Dynamic Upazila Autocomplete Suggestions for Text inputs using datalists
-function setupDynamicUpazilaAutocomplete(districtInputId, upazilaDatalistId) {
-  const districtInput = document.getElementById(districtInputId);
-  const upazilaDatalist = document.getElementById(upazilaDatalistId);
-  
-  if (!districtInput || !upazilaDatalist) return;
-
-  const updateUpazilas = () => {
-    const val = districtInput.value.trim().toLowerCase();
-    
-    // Check if the value matches either a district code or name
-    let code = null;
-    if (DISTRICT_TO_CODE[val]) {
-      code = DISTRICT_TO_CODE[val];
-    } else {
-      // Find by code directly (e.g. if profile has "40" stored)
-      for (const [name, c] of Object.entries(DISTRICT_TO_CODE)) {
-        if (c === val) {
-          code = c;
-          break;
-        }
-      }
-    }
-    
-    upazilaDatalist.innerHTML = "";
-    
-    if (code && UPAZILA_MAP[code]) {
-      UPAZILA_MAP[code].forEach(up => {
-        const option = document.createElement("option");
-        option.value = up.name; // Keep as text name for clean user viewing
-        option.setAttribute("data-code", up.code);
-        upazilaDatalist.appendChild(option);
-      });
-    }
-  };
-
-  districtInput.addEventListener("input", updateUpazilas);
-  districtInput.addEventListener("change", updateUpazilas);
-  updateUpazilas();
-}
-
 // Present and Permanent Address Sync Logic
 function initAddressSync() {
-  setupDynamicUpazilaAutocomplete("present_district", "present_upazilas_list");
-  setupDynamicUpazilaAutocomplete("permanent_district", "permanent_upazilas_list");
-
   const syncCheckbox = document.getElementById("same_as_present");
   const permFieldsWrapper = document.getElementById("permanentAddressFields");
 
@@ -520,10 +658,21 @@ function populateForm(profile) {
         val = translateCodeToName(f, val);
       }
 
-      if (el.tagName === "SELECT") {
-        selectSelectOptionSmart(el, val);
+      // Check if it's one of the custom-select fields
+      const customMapping = customSelectFields.find(cs => cs.select === f);
+      if (customMapping) {
+        setSelectOrCustomValue(customMapping.select, customMapping.custom, val);
       } else {
-        el.value = val;
+        if (el.tagName === "SELECT") {
+          selectSelectOptionSmart(el, val);
+        } else {
+          el.value = val;
+        }
+        
+        // If it is district, dispatch change event to populate upazila options
+        if (f.endsWith("district")) {
+          el.dispatchEvent(new Event("change"));
+        }
       }
     }
   });
@@ -542,10 +691,6 @@ function populateForm(profile) {
   document.getElementById("same_as_present").dispatchEvent(new Event("change"));
   document.getElementById("if_applicable_mas").dispatchEvent(new Event("change"));
   document.getElementById("if_applicable_exp").dispatchEvent(new Event("change"));
-
-  // Trigger autocompleter input events to sync upazila datalists
-  document.getElementById("present_district").dispatchEvent(new Event("input"));
-  document.getElementById("permanent_district").dispatchEvent(new Event("input"));
 
   // Clear and load job experiences
   const expContainer = document.getElementById("experienceList");
@@ -575,9 +720,14 @@ function gatherProfileData() {
   ];
 
   fields.forEach(f => {
-    const el = document.getElementById(f);
-    if (el) {
-      profile[f] = el.value;
+    const customMapping = customSelectFields.find(cs => cs.select === f);
+    if (customMapping) {
+      profile[f] = getSelectOrCustomValue(customMapping.select, customMapping.custom);
+    } else {
+      const el = document.getElementById(f);
+      if (el) {
+        profile[f] = el.value;
+      }
     }
   });
 
