@@ -33,7 +33,6 @@ try {
   vm.createContext(context);
   vm.runInContext(jsYamlContent, context);
 
-  // In js-yaml browser minified build, it exports to window.jsyaml or self.jsyaml or global
   jsyaml = context.jsyaml || context.window.jsyaml;
   assert(!!jsyaml, "js-yaml library loaded successfully");
 } catch (e) {
@@ -72,19 +71,17 @@ if (jsyaml) {
   }
 }
 
-// 3. Test Smart Selection Matching Logic (matching selector rules from content scripts)
+// 3. Test Smart Selection Matching Logic
 function selectDropdownSmartMock(options, value) {
   if (!options || value === undefined || value === null) return null;
   const stringVal = String(value).trim().toLowerCase();
   
-  // Exact Match on Option Value
   for (let option of options) {
     if (option.value.trim().toLowerCase() === stringVal) {
       return option.value;
     }
   }
   
-  // Exact or Partial Match on Option Text
   for (let option of options) {
     const text = option.text.trim().toLowerCase();
     if (text === stringVal || text.includes(stringVal) || stringVal.includes(text)) {
@@ -133,12 +130,111 @@ assert(translateCodeToNameMock("permanent_district", "55") === "Cumilla", "Trans
 assert(translateCodeToNameMock("present_district", "dhaka") === "Dhaka", "Translate district name 'dhaka' to 'Dhaka'");
 assert(translateCodeToNameMock("present_district", "unknown") === "unknown", "Translate unknown district as-is");
 
-console.log(`\n${YELLOW}=========================================${RESET}`);
-console.log(`${passed + failed} Tests Run: ${GREEN}${passed} Passed${RESET}, ${RED}${failed} Failed${RESET}`);
-console.log(`${YELLOW}=========================================${RESET}`);
+// 5. Test ChakriFillSecurity encryption and decryption
+(async () => {
+  try {
+    const securityJsContent = fs.readFileSync(path.join(__dirname, '../content/security.js'), 'utf8');
+    const vm = require('vm');
+    
+    const nodeCrypto = require('crypto');
+    
+    // Simple localStorage mock
+    const mockLocalStorage = {
+      _store: {},
+      getItem(key) { return this._store[key] || null; },
+      setItem(key, val) { this._store[key] = String(val); }
+    };
 
-if (failed > 0) {
-  process.exit(1);
-} else {
-  process.exit(0);
-}
+    // Polyfill WebCrypto AES-GCM for Node.js v12 compatibility
+    const mockCrypto = {
+      getRandomValues(typedArray) {
+        const bytes = nodeCrypto.randomBytes(typedArray.byteLength);
+        typedArray.set(bytes);
+        return typedArray;
+      },
+      subtle: {
+        async importKey(format, keyData, algorithm, extractable, keyUsages) {
+          return keyData;
+        },
+        async encrypt(algorithm, key, data) {
+          const iv = algorithm.iv;
+          const cipher = nodeCrypto.createCipheriv('aes-256-gcm', key, iv);
+          const encrypted = Buffer.concat([cipher.update(data), cipher.final()]);
+          const tag = cipher.getAuthTag();
+          return new Uint8Array(Buffer.concat([encrypted, tag]));
+        },
+        async decrypt(algorithm, key, data) {
+          const iv = algorithm.iv;
+          const tagLength = 16;
+          const ciphertext = data.slice(0, data.length - tagLength);
+          const tag = data.slice(data.length - tagLength);
+          const decipher = nodeCrypto.createDecipheriv('aes-256-gcm', key, iv);
+          decipher.setAuthTag(tag);
+          const decrypted = Buffer.concat([decipher.update(ciphertext), decipher.final()]);
+          return new Uint8Array(decrypted);
+        }
+      }
+    };
+
+    const context = { 
+      window: {}, 
+      console,
+      crypto: mockCrypto,
+      localStorage: mockLocalStorage,
+      Uint8Array,
+      String,
+      atob: str => Buffer.from(str, 'base64').toString('binary'),
+      btoa: str => Buffer.from(str, 'binary').toString('base64'),
+      TextEncoder: require('util').TextEncoder,
+      TextDecoder: require('util').TextDecoder
+    };
+    context.window.crypto = mockCrypto;
+    
+    vm.createContext(context);
+    vm.runInContext(securityJsContent, context);
+
+    const security = context.window.ChakriFillSecurity;
+    assert(!!security, "ChakriFillSecurity library loaded successfully in Node test context");
+
+    const key = await security.getOrCreateKey();
+    assert(!!key && key.length === 64, "Key generation returns a valid 64-character hex key");
+
+    const testProfile = { name: "Rahim Uddin", age: 28, skills: ["JS", "CSS"] };
+    const encrypted = await security.encryptSingleProfile(testProfile, key);
+    assert(typeof encrypted === "string" && encrypted.length > 0, "Profile encrypted to a base64 string");
+
+    const decrypted = await security.decryptSingleProfile(encrypted, key);
+    assert(decrypted.name === testProfile.name, "Decrypted profile name matches exactly");
+    assert(decrypted.age === testProfile.age, "Decrypted profile age matches exactly");
+    assert(JSON.stringify(decrypted.skills) === JSON.stringify(testProfile.skills), "Decrypted nested skills array matches exactly");
+
+    // Test multiple profiles collection
+    const testProfiles = {
+      "Default": { name: "Default User" },
+      "Developer": { name: "Dev User" }
+    };
+    const encryptedProfiles = await security.encryptProfiles(testProfiles, key);
+    const decryptedProfiles = await security.decryptProfiles(encryptedProfiles, key);
+    assert(decryptedProfiles.Default.name === "Default User", "Decrypted profiles 'Default' name matches");
+    assert(decryptedProfiles.Developer.name === "Dev User", "Decrypted profiles 'Developer' name matches");
+
+    // Verify that unencrypted legacy data is passed-through safely
+    const legacyData = { "Default": { name: "Legacy User" } };
+    const passThrough = await security.decryptProfiles(legacyData, key);
+    assert(passThrough.Default.name === "Legacy User", "Legacy (unencrypted) profiles passed through cleanly");
+
+    // Final Reporting
+    console.log(`\n${YELLOW}=========================================${RESET}`);
+    console.log(`${passed + failed} Tests Run: ${GREEN}${passed} Passed${RESET}, ${RED}${failed} Failed${RESET}`);
+    console.log(`${YELLOW}=========================================${RESET}`);
+
+    if (failed > 0) {
+      process.exit(1);
+    } else {
+      process.exit(0);
+    }
+  } catch (err) {
+    console.error("Async security tests threw error:", err);
+    process.exit(1);
+  }
+})();
