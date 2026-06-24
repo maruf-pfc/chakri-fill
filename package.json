@@ -4,7 +4,8 @@
   "description": "Smart job application autofill Chrome extension for Bangladesh",
   "main": "background/background.js",
   "scripts": {
-    "test": "node tests/run.js"
+    "test": "node tests/run.js",
+    "build": "node scripts/build.js"
   },
   "keywords": [
     "chrome-extension",

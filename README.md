@@ -38,15 +38,16 @@ Instead of tediously re-entering your name, address, educational qualifications,
 
 ---
 
-## 🚀 Installation
+## 🚀 Installation & Build
 
-> **⚠️ Not on the Chrome Web Store yet.**  
-> ChakriFill is in developer preview. You must load it manually using Chrome's
-> built-in Developer Mode — no special tools or coding knowledge required.
+> **⚠️ Not on the browser web stores yet.**  
+> ChakriFill is in developer preview. You can load the raw folder manually or build optimized release packages for Chrome/Firefox.
 
 ### Requirements
 
-- Google Chrome, Brave, Edge, or any Chromium-based browser
+- **Chromium Browsers:** Google Chrome, Brave, Microsoft Edge, Opera, etc.
+- **Gecko Browsers:** Mozilla Firefox (Manifest V3 supported)
+- **Node.js (Optional):** Version 12+ (for building release packages)
 - The extension source code (download or clone — see Step 1)
 
 ---
@@ -91,27 +92,41 @@ Three new buttons will appear: *Load unpacked*, *Pack extension*, *Update*.
 
 #### Step 4 — Load the extension
 
-Click **"Load unpacked"** and select the folder you extracted/cloned in Step 1.
+##### For Chrome / Chromium:
+1. Click **"Load unpacked"**.
+2. Select the repository root folder (which directly contains `manifest.json`).
 
-> ✅ Select the folder that **directly contains `manifest.json`** — not a parent or subfolder.
-
-ChakriFill will now appear in your extensions list with a green toggle.
+##### For Firefox:
+1. Open a new tab, type **`about:debugging`** in the address bar, and press Enter.
+2. Click **"This Firefox"** in the left sidebar.
+3. Click **"Load Temporary Add-on..."**.
+4. Select the **`manifest.json`** or **`manifest.firefox.json`** from the project directory.
 
 ---
 
 #### Step 5 — Pin it to your toolbar _(recommended)_
 
-1. Click the **puzzle-piece 🧩 icon** in the browser toolbar
-2. Find **ChakriFill** in the list
-3. Click the **pin 📌 icon** next to it
+1. Click the **puzzle-piece 🧩 icon** in the browser toolbar (or the extensions menu).
+2. Find **ChakriFill** in the list.
+3. Click the **pin 📌 icon** (or toggle visibility) next to it.
 
 The ChakriFill icon will now be permanently visible in your toolbar.
 
 ---
 
-> **Note:** Every time you restart Chrome, the extension stays loaded automatically.
-> You do **not** need to re-load it. If Chrome warns you about "developer mode extensions",
-> simply dismiss the notification — this is normal for unpublished extensions.
+### 📦 Building Release Packages
+
+To build production-ready packages for Chrome and Firefox (specifically managing Manifest V3 platform differences):
+
+1. Run the build script in the project directory:
+   ```bash
+   npm run build
+   # Or directly:
+   node scripts/build.js
+   ```
+2. The built folders and ready-to-upload zip archives will be saved in the **`dist/`** directory:
+   - `dist/chrome/` & `dist/chakri-fill-chrome.zip` (For Chrome Web Store)
+   - `dist/firefox/` & `dist/chakri-fill-firefox.zip` (For Firefox AMO)
 
 ---
 
@@ -493,7 +508,7 @@ Then load and run `content/matcher.js` followed by `content/autofill.js` in the 
 - [x] District → Upazila cascade handling
 - [x] Smart captcha bypass
 - [x] JSON profile backup / import
-- [ ] Firefox (Manifest V3) support
+- [x] Firefox (Manifest V3) support
 - [ ] Chrome Web Store release
 - [ ] Multiple saved profiles
 - [ ] Auto-detect form type and load matching template

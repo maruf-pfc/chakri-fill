@@ -1,3 +1,4 @@
-form.html
 node_modules
 package-lock.json
+dist/
+*.zip
