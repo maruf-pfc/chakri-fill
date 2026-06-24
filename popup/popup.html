@@ -20,8 +20,14 @@
 
       <!-- Dynamic Status Card -->
       <div class="status-card" id="statusCard">
+        <div class="status-row" style="margin-bottom: 4px;">
+          <span class="status-label">Active Profile:</span>
+          <select id="popupProfileSelect" class="popup-profile-select" title="Active Profile">
+            <option value="Default">Default</option>
+          </select>
+        </div>
         <div class="status-row">
-          <span class="status-label">Profile Status</span>
+          <span class="status-label">Profile Status:</span>
           <span class="status-badge empty" id="statusBadge">Empty</span>
         </div>
         

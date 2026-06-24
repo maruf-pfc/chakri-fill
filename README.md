@@ -510,7 +510,7 @@ Then load and run `content/matcher.js` followed by `content/autofill.js` in the 
 - [x] JSON profile backup / import
 - [x] Firefox (Manifest V3) support
 - [x] Chrome Web Store release (Publishing Guide & Release Packages Ready)
-- [ ] Multiple saved profiles
+- [x] Multiple saved profiles
 - [ ] Auto-detect form type and load matching template
 
 ---

@@ -687,3 +687,57 @@ input[list]::-webkit-calendar-picker-indicator {
   display: none !important;
 }
 
+/* Profile Switcher Styles */
+.profile-picker {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--input-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  padding: 3px 6px;
+  margin-right: 0.5rem;
+}
+
+.profile-select-dropdown {
+  background: transparent;
+  border: none;
+  color: var(--text-color);
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 4px 8px;
+  outline: none;
+  cursor: pointer;
+  max-width: 140px;
+}
+
+.profile-select-dropdown option {
+  background: #111827; /* Dark background to match solid options list */
+  color: var(--text-color);
+}
+
+.btn-action-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-action-icon:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-color);
+}
+
+.btn-danger-icon:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+

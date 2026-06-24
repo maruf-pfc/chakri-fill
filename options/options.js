@@ -125,6 +125,12 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("exportJsonBtn").addEventListener("click", () => exportProfile("json"));
   document.getElementById("exportYamlBtn").addEventListener("click", () => exportProfile("yaml"));
 
+  // Profile Selector and Management Actions
+  document.getElementById("profileSelect").addEventListener("change", handleProfileChange);
+  document.getElementById("newProfileBtn").addEventListener("click", handleNewProfile);
+  document.getElementById("renameProfileBtn").addEventListener("click", handleRenameProfile);
+  document.getElementById("deleteProfileBtn").addEventListener("click", handleDeleteProfile);
+
   // Form submission
   document.getElementById("profileForm").addEventListener("submit", saveProfile);
 });
@@ -602,24 +608,61 @@ function gatherProfileData() {
   return profile;
 }
 
-// Load profile from Chrome storage
+// State
+let allProfiles = { "Default": {} };
+let currentProfileName = "Default";
+
+// Load profiles from Chrome storage
 async function loadSavedProfile() {
+  let data = {};
   if (typeof chrome !== "undefined" && chrome.storage) {
-    const data = await chrome.storage.local.get("profile");
-    if (data && data.profile) {
-      populateForm(data.profile);
-    }
+    data = await chrome.storage.local.get(["profiles", "activeProfileName", "profile"]);
   } else {
     // Local storage fallback for previews
-    const saved = localStorage.getItem("profile");
-    if (saved) {
-      try {
-        populateForm(JSON.parse(saved));
-      } catch (e) {
-        console.error("Local storage parse fail", e);
-      }
-    }
+    try {
+      data = {
+        profiles: JSON.parse(localStorage.getItem("profiles")),
+        activeProfileName: localStorage.getItem("activeProfileName"),
+        profile: JSON.parse(localStorage.getItem("profile"))
+      };
+    } catch (e) {}
   }
+
+  // Schema migration and backwards compatibility check
+  if (data.profiles && Object.keys(data.profiles).length > 0) {
+    allProfiles = data.profiles;
+  } else if (data.profile && Object.keys(data.profile).length > 0) {
+    allProfiles = { "Default": data.profile };
+  } else {
+    allProfiles = { "Default": typeof DEFAULT_PROFILE !== "undefined" ? DEFAULT_PROFILE : {} };
+  }
+
+  currentProfileName = data.activeProfileName || "Default";
+  if (!allProfiles[currentProfileName]) {
+    currentProfileName = Object.keys(allProfiles)[0] || "Default";
+  }
+
+  // Rebuild the select options
+  updateProfileDropdown();
+
+  // Populate fields
+  populateForm(allProfiles[currentProfileName]);
+}
+
+// Rebuild the profile switcher dropdown
+function updateProfileDropdown() {
+  const select = document.getElementById("profileSelect");
+  if (!select) return;
+  select.innerHTML = "";
+  Object.keys(allProfiles).forEach(name => {
+    const opt = document.createElement("option");
+    opt.value = name;
+    opt.textContent = name;
+    if (name === currentProfileName) {
+      opt.selected = true;
+    }
+    select.appendChild(opt);
+  });
 }
 
 // Save profile to Chrome storage
@@ -627,14 +670,133 @@ async function saveProfile(e) {
   if (e) e.preventDefault();
 
   const profile = gatherProfileData();
+  allProfiles[currentProfileName] = profile;
   
   if (typeof chrome !== "undefined" && chrome.storage) {
-    await chrome.storage.local.set({ profile });
-    showToast("Profile settings saved successfully!", "success");
+    await chrome.storage.local.set({
+      profiles: allProfiles,
+      activeProfileName: currentProfileName,
+      profile: profile // Sync for backwards-compatibility
+    });
+    showToast(`Profile "${currentProfileName}" saved successfully!`, "success");
   } else {
+    localStorage.setItem("profiles", JSON.stringify(allProfiles));
+    localStorage.setItem("activeProfileName", currentProfileName);
     localStorage.setItem("profile", JSON.stringify(profile));
-    showToast("Saved to local storage mock profile.", "info");
+    showToast(`Saved "${currentProfileName}" to mock local storage.`, "info");
   }
+
+  // Refresh live editors
+  updateCodeTextareas();
+}
+
+// Handle profile switcher change event
+async function handleProfileChange(e) {
+  const selected = e.target.value;
+  if (selected && allProfiles[selected]) {
+    // Save current profile changes first
+    allProfiles[currentProfileName] = gatherProfileData();
+    
+    currentProfileName = selected;
+    populateForm(allProfiles[selected]);
+
+    // Save active state to storage
+    if (typeof chrome !== "undefined" && chrome.storage) {
+      await chrome.storage.local.set({
+        profiles: allProfiles,
+        activeProfileName: currentProfileName,
+        profile: allProfiles[currentProfileName]
+      });
+    } else {
+      localStorage.setItem("profiles", JSON.stringify(allProfiles));
+      localStorage.setItem("activeProfileName", currentProfileName);
+      localStorage.setItem("profile", JSON.stringify(allProfiles[currentProfileName]));
+    }
+
+    showToast(`Switched to profile: ${selected}`, "info");
+    updateCodeTextareas();
+  }
+}
+
+// Create new profile
+async function handleNewProfile() {
+  const name = prompt("Enter a name for the new profile:");
+  if (!name) return;
+  const trimmed = name.trim();
+  if (!trimmed) return;
+
+  if (allProfiles[trimmed]) {
+    showToast("A profile with this name already exists.", "danger");
+    return;
+  }
+
+  // Clone current form data into the new profile
+  allProfiles[trimmed] = gatherProfileData();
+  currentProfileName = trimmed;
+
+  updateProfileDropdown();
+  showToast(`Profile "${trimmed}" created!`, "success");
+  await saveProfile();
+}
+
+// Rename current profile
+async function handleRenameProfile() {
+  if (currentProfileName === "Default") {
+    showToast("The 'Default' profile cannot be renamed.", "warning");
+    return;
+  }
+  const name = prompt(`Rename profile "${currentProfileName}" to:`, currentProfileName);
+  if (!name) return;
+  const trimmed = name.trim();
+  if (!trimmed || trimmed === currentProfileName) return;
+
+  if (allProfiles[trimmed]) {
+    showToast("A profile with this name already exists.", "danger");
+    return;
+  }
+
+  const data = allProfiles[currentProfileName];
+  delete allProfiles[currentProfileName];
+  allProfiles[trimmed] = data;
+
+  currentProfileName = trimmed;
+  updateProfileDropdown();
+  showToast(`Profile renamed to "${trimmed}"`, "success");
+  await saveProfile();
+}
+
+// Delete current profile
+async function handleDeleteProfile() {
+  if (Object.keys(allProfiles).length <= 1) {
+    showToast("You must keep at least one profile.", "warning");
+    return;
+  }
+
+  if (!confirm(`Are you sure you want to delete the profile "${currentProfileName}"?`)) {
+    return;
+  }
+
+  delete allProfiles[currentProfileName];
+  currentProfileName = Object.keys(allProfiles)[0];
+
+  updateProfileDropdown();
+  populateForm(allProfiles[currentProfileName]);
+  showToast("Profile deleted.", "warning");
+
+  // Save updated profiles
+  if (typeof chrome !== "undefined" && chrome.storage) {
+    await chrome.storage.local.set({
+      profiles: allProfiles,
+      activeProfileName: currentProfileName,
+      profile: allProfiles[currentProfileName]
+    });
+  } else {
+    localStorage.setItem("profiles", JSON.stringify(allProfiles));
+    localStorage.setItem("activeProfileName", currentProfileName);
+    localStorage.setItem("profile", JSON.stringify(allProfiles[currentProfileName]));
+  }
+  
+  updateCodeTextareas();
 }
 
 // Drag and Drop File Upload Sync Setup

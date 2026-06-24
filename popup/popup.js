@@ -8,47 +8,112 @@ document.addEventListener("DOMContentLoaded", async () => {
   const fillBtn = document.getElementById("fillBtn");
   const settingsBtn = document.getElementById("settingsBtn");
   const helpLink = document.getElementById("helpLink");
+  const popupProfileSelect = document.getElementById("popupProfileSelect");
 
-  // Load profile from storage to check status
+  let profiles = { "Default": {} };
+  let activeProfileName = "Default";
   let profile = null;
-  if (typeof chrome !== "undefined" && chrome.storage) {
-    const data = await chrome.storage.local.get("profile");
-    profile = data.profile;
-  } else {
-    // Local storage fallback for local development/previews
-    const saved = localStorage.getItem("profile");
-    if (saved) {
-      try {
-        profile = JSON.parse(saved);
-      } catch (e) {
-        console.error("Local storage parse fail", e);
+
+  // Load profile state
+  async function loadProfileState() {
+    if (typeof chrome !== "undefined" && chrome.storage) {
+      const data = await chrome.storage.local.get(["profiles", "activeProfileName", "profile"]);
+      profiles = data.profiles || {};
+      activeProfileName = data.activeProfileName || "Default";
+      
+      // Migration fallback for existing single profile
+      if (data.profile && Object.keys(profiles).length === 0) {
+        profiles[activeProfileName] = data.profile;
+        await chrome.storage.local.set({ profiles, activeProfileName });
       }
+    } else {
+      // Local storage fallback for local development/previews
+      try {
+        profiles = JSON.parse(localStorage.getItem("profiles")) || { "Default": {} };
+        activeProfileName = localStorage.getItem("activeProfileName") || "Default";
+      } catch (e) {}
+    }
+
+    if (!profiles[activeProfileName]) {
+      activeProfileName = Object.keys(profiles)[0] || "Default";
+    }
+
+    // Populate dropdown options
+    updatePopupProfileDropdown();
+
+    // Set current active profile
+    profile = profiles[activeProfileName];
+    updateUIPreview();
+  }
+
+  // Populate popup dropdown
+  function updatePopupProfileDropdown() {
+    if (!popupProfileSelect) return;
+    popupProfileSelect.innerHTML = "";
+    Object.keys(profiles).forEach(name => {
+      const opt = document.createElement("option");
+      opt.value = name;
+      opt.textContent = name;
+      if (name === activeProfileName) {
+        opt.selected = true;
+      }
+      popupProfileSelect.appendChild(opt);
+    });
+  }
+
+  // Update popup preview fields
+  function updateUIPreview() {
+    if (profile && profile.name) {
+      statusBadge.textContent = "Ready";
+      statusBadge.className = "status-badge ready";
+      emptyWarning.style.display = "none";
+      profileDetails.style.display = "block";
+      profileName.textContent = profile.name;
+      profileMobile.textContent = profile.mobile || "-";
+      
+      // Academic short summary
+      const eduExam = profile.gra_subject || profile.hsc_group || profile.ssc_group || "-";
+      profileEdu.textContent = eduExam;
+      
+      // Enable Autofill Button
+      fillBtn.disabled = false;
+    } else {
+      statusBadge.textContent = "Empty";
+      statusBadge.className = "status-badge empty";
+      emptyWarning.style.display = "block";
+      profileDetails.style.display = "none";
+      
+      // Disable Autofill Button
+      fillBtn.disabled = true;
     }
   }
 
-  if (profile && profile.name) {
-    // Hydrate UI with Profile Summary
-    statusBadge.textContent = "Ready";
-    statusBadge.className = "status-badge ready";
-    emptyWarning.style.display = "none";
-    profileDetails.style.display = "block";
-    profileName.textContent = profile.name;
-    profileMobile.textContent = profile.mobile || "-";
-    
-    // Academic short summary
-    const eduExam = profile.gra_subject || profile.hsc_group || profile.ssc_group || "-";
-    profileEdu.textContent = eduExam;
-    
-    // Enable Autofill Button
-    fillBtn.disabled = false;
-  } else {
-    // Unconfigured State
-    statusBadge.textContent = "Empty";
-    statusBadge.className = "status-badge empty";
-    emptyWarning.style.display = "block";
-    profileDetails.style.display = "none";
-    fillBtn.disabled = true;
+  // Dropdown switcher listener
+  if (popupProfileSelect) {
+    popupProfileSelect.addEventListener("change", async (e) => {
+      const selected = e.target.value;
+      if (selected && profiles[selected]) {
+        activeProfileName = selected;
+        profile = profiles[selected];
+        
+        // Save choice
+        if (typeof chrome !== "undefined" && chrome.storage) {
+          await chrome.storage.local.set({
+            activeProfileName: activeProfileName,
+            profile: profile // Sync for injection compatibility
+          });
+        } else {
+          localStorage.setItem("activeProfileName", activeProfileName);
+          localStorage.setItem("profile", JSON.stringify(profile));
+        }
+        
+        updateUIPreview();
+      }
+    });
   }
+
+  // Load state on startup
+  await loadProfileState();
 
   // Open Options page
   settingsBtn.addEventListener("click", () => {

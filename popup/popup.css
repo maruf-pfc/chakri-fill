@@ -233,3 +233,23 @@ footer a:hover {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* Profile Selector Styles */
+.popup-profile-select {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  color: var(--text-color);
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 3px 6px;
+  outline: none;
+  cursor: pointer;
+  max-width: 140px;
+}
+
+.popup-profile-select option {
+  background: #0f172a;
+  color: var(--text-color);
+}
+
